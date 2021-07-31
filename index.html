@@ -1,0 +1,2442 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <style>
+
+      :root {
+        --accent-color: #E8336D;
+      }
+
+      html *
+      {
+/*         font-size: 1em !important;*/
+         /*color: #000 !important;*/
+         font-family: 'Lato' !important;
+      }
+
+/*      body{
+          background-color: whitesmoke;
+       }*/
+
+      svg {
+          background-color: white;
+          font-family: 'Lato';
+       }
+
+      .overlay {
+        fill: none;
+        pointer-events: all;
+      }
+
+      .focus circle {
+        fill: white;
+        stroke: var(--accent-color);
+        stroke-width: 2px;
+      }
+        
+      .hover-line {
+        stroke: var(--accent-color);
+        stroke-width: 2px;
+        stroke-dasharray: 1,1;
+      }
+
+      .hover-text {
+        fill: var(--accent-color);
+        font-weight: bold;
+        /*font-size: 0.9em;*/
+      }
+
+      .annotation path {
+        stroke: var(--accent-color);
+        fill: none;
+      }
+
+/*      .annotation:not(.above):not(.anomaly) path {
+        stroke-dasharray: 1,3;
+      }*/
+
+      .handle {
+        visibility: hidden;
+      }
+
+      .annotation path.connector-arrow{
+        fill: var(--accent-color);
+      }
+
+      .annotation text {
+          fill: var(--accent-color);
+        }
+
+        .annotation-note-title {
+          font-weight: bold;
+        }
+
+        .annotation.xythreshold {
+        cursor: move;
+      }
+
+      .annotation.xythreshold .annotation-subject{
+        stroke-width: 3px;
+      }
+
+      .annotation.badge path.subject-pointer, .annotation.badge path.subject {
+        fill: var(--accent-color);
+        stroke-width: 3px;
+        stroke-linecap: round;
+      } 
+
+      .annotation.badge path.subject-ring {
+        fill: white;
+        stroke-width: 3px;
+      }
+
+      .annotation.badge .badge-text {
+        fill: white;
+        font-size: .7em;
+      }
+          
+      rect.annotation-note-bg {
+        fill: rgba(255, 255, 255, 0);
+        /*fill: rgba(0, 0, 0, 0);*/
+      }
+
+      text.hover {
+        font-size: .7em;
+      }
+
+      text.title {
+        font-size: 1.2em;
+        font-weight: bold;
+      }
+
+      my_dataviz1_text {
+        fill: var(--accent-color);
+      }
+
+      my_dataviz2_text {
+        fill: var(--accent-color);
+      }
+
+      my_dataviz3_text {
+        fill: var(--accent-color);
+      }
+
+      my_dataviz4_text {
+        fill: var(--accent-color);
+      }
+
+      my_dataviz5_text {
+        fill: var(--accent-color);
+      }
+
+    </style>
+
+    <title>Narrative Visualization</title>
+  </head>
+
+  <!-- Body starts here -->
+  <body onload="myFunction1();">
+    <div class="container">
+      <!-- Headline -->
+      <br>
+      <h3>Covid-19 Timeline in US</h3>
+      <br>
+
+
+      <div class="row border border-secondary">
+        <!-- Buttons -->
+        <div class="container mt-3">          
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button id="but1" type="button" class="btn btn-info" onclick="myFunction1()">1</button>
+            <button id="but2" type="button" class="btn btn-info" onclick="myFunction2()">2</button>
+            <button id="but3" type="button" class="btn btn-info" onclick="myFunction3()">3</button>
+            <button id="but4" type="button" class="btn btn-info" onclick="myFunction4()">4</button>
+            <button id="but5" type="button" class="btn btn-info" onclick="myFunction5()">5</button>
+          </div>
+        </div>
+
+        <!-- The chart -->
+        <div class="container mt-3">
+          <!-- <p class="text-left">The chart will sit here</p> -->
+          <div id="main" class="container mt-3">
+            
+          </div>
+        </div>
+      
+      </div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- D3 JavaScript -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <!-- Color Scale -->
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <!-- Load d3-annotation -->
+    <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+
+    <script>
+      //Function to remove Divs
+      function removeDivs() {
+        d3.select("#my_dataviz1_outer").remove();
+        d3.select("#my_dataviz2_outer").remove();
+        d3.select("#my_dataviz3_outer").remove();
+        d3.select("#my_dataviz4_outer").remove();
+        d3.select("#my_dataviz5_outer").remove();        
+      }
+      
+      //1st chart
+      function myFunction1() {
+        removeDivs();
+
+        document.getElementById("but1").style.color = "white";
+        document.getElementById("but2").style.color = "black";
+        document.getElementById("but3").style.color = "black";
+        document.getElementById("but4").style.color = "black";
+        document.getElementById("but5").style.color = "black";
+        document.getElementById("but2").style.background = "#f1f1f1";
+        document.getElementById("but3").style.background = "#f1f1f1";
+        document.getElementById("but4").style.background = "#f1f1f1";
+        document.getElementById("but5").style.background = "#f1f1f1";
+        document.getElementById("but1").style.background = "#666";
+
+        var div_outer = document.createElement("div");
+        div_outer.id = "my_dataviz1_outer";
+        document.getElementById("main").appendChild(div_outer);
+
+        var div_text = document.createElement("div");
+        div_text.id = "my_dataviz1_text";
+        document.getElementById("my_dataviz1_outer").appendChild(div_text);
+
+        var text0 = document.createTextNode("Covid-19 impact in US:");
+        bold = document.createElement('strong');
+        bold.appendChild(text0);
+        document.getElementById("my_dataviz1_text").appendChild(bold);
+
+        var brk0 = document.createElement("br");
+        document.getElementById("my_dataviz1_text").appendChild(brk0);
+
+        var text = document.createTextNode("Like many other countries in the world, US is also heavily impacted by Covid-19 (novel coronavirus caused by SARS-CoV2 virus). US is the most impacted country in the world by number of cases and deaths. Till date US has recorded more than 35.5 million cases and more than 600,000 deaths.");
+        document.getElementById("my_dataviz1_text").appendChild(text);
+
+        var brk = document.createElement("br");
+        document.getElementById("my_dataviz1_text").appendChild(brk);
+        var brk2 = document.createElement("br");
+        document.getElementById("my_dataviz1_text").appendChild(brk2);
+
+        // var cases_text = document.createElement("p")
+        // cases_text.id = "cases_text";
+        // document.getElementById("my_dataviz1_text").appendChild(cases_text);
+      
+
+        // var brk3 = document.createElement("br");
+        // document.getElementById("my_dataviz1_text").appendChild(brk3);
+
+        var div = document.createElement("div");
+        div.id = "my_dataviz1";
+        document.getElementById("my_dataviz1_outer").appendChild(div);
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 30, right: 60, bottom: 30, left: 60},
+            width = 1050 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#my_dataviz1")
+          .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var div = document.createElement("div");
+        div.id = "tooltip";
+        // div.style.position = "absolute";
+        div.style.padding = "5px";
+        div.style.backgroundColor = "white";
+        document.getElementById("my_dataviz1").appendChild(div);
+
+        const tooltip = d3.select('#tooltip');
+        const tooltipLine = svg.append('line');
+        var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+        //Read the data
+        d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us.csv",
+        // When reading the csv, I must format variables:
+        function(d){
+          return { date : d3.timeParse("%Y-%m-%d")(d.date), cases : d.cases, deaths : d.deaths }
+        },
+        // Now I can use this dataset:
+        function(data) {
+          // Add X axis --> it is a date format
+          var x = d3.scaleTime()
+            .domain(d3.extent(data, function(d) { return d.date; }))
+            .range([ 0, width ]);
+          svg.append("g")
+            .transition()
+            // .ease(d3.easeLinear)
+            .duration(500)
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+          setTimeout(function(){
+              // Add Y axis
+              var y0 = d3.scaleLinear()
+                .domain([0, d3.max(data, function(d) { return +d.cases; })])
+                .range([ height, 0 ]);
+              svg.append("g")
+                .call(d3.axisLeft(y0))
+                .append("text")
+                  .attr("y", -2)
+                  .attr("fill", "darkseagreen")
+                  .attr("text-anchor", "start")
+                  .attr("font-size",11)
+                  .text("↑ Cases");
+            
+              // Add 2nd Y axis
+              var y1 = d3.scaleLinear()
+                .domain([0, d3.max(data, function(d) { return +d.deaths; })])
+                .range([ height, 0 ]);
+              svg.append("g")
+                .attr("transform", "translate(" + width + " ,0)")
+                .call(d3.axisRight(y1))
+                .append("text")
+                  .attr("y", -2)
+                  .attr("fill", "indianred")
+                  .attr("text-anchor", "start")
+                  .attr("font-size",11)
+                  .text("↑ Deaths");         
+
+              // Add the line
+              svg.append("path")
+                .datum(data)
+                .classed("line", true)
+                .attr("fill", "none")
+                .attr("stroke", "darkseagreen")
+                .attr("stroke-width", 2)            
+                .attr("d", d3.line()
+                  .x(function(d) { return x(d.date) })
+                  .y(function(d) { return y0(d.cases) })
+                  )
+                .attr("stroke-dasharray", function(d) {
+                  return this.getTotalLength()
+                })
+                .attr("stroke-dashoffset", function(d) {
+                  return this.getTotalLength()
+                });         
+          
+              // Add the 2nd line
+              svg.append("path")
+                .datum(data)
+                .classed("line", true)
+                .attr("fill", "none")
+                .attr("stroke", "indianred")
+                .attr("stroke-width", 2)
+                .attr("d", d3.line()
+                  .x(function(d) { return x(d.date) })
+                  .y(function(d) { return y1(d.deaths) })
+                  )
+                .attr("stroke-dasharray", function(d) {
+                  return this.getTotalLength()
+                })
+                .attr("stroke-dashoffset", function(d) {
+                  return this.getTotalLength()
+                });
+
+              svg.selectAll(".line")
+                .transition()
+                .duration(2000)
+                .ease(d3.easeLinear)
+                .attr("stroke-dashoffset", 0);
+
+              tipBox = svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('opacity', 0)
+                .attr("class", "overlay")
+                .on('mousemove', drawTooltip)
+                .on('mouseout', removeTooltip);
+
+              function removeTooltip() {
+                if (tooltip) tooltip.style('display', 'none');
+                if (tooltipLine) tooltipLine.attr('stroke', 'none');
+              }
+
+              function drawTooltip() {
+                const x0 = x.invert(d3.mouse(tipBox.node())[0]);
+                var i = bisectDate(data, x0, 1),
+                      d0 = data[i - 1],
+                      d1 = data[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+                tooltipLine.attr('stroke', 'black')
+                  .attr('x1', x(x0))
+                  .attr('x2', x(x0))
+                  .attr('y1', 0)
+                  .attr('y2', height);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                tooltip.html(format_date(d.date) + " - Cases: " + d.cases + " & Deaths: " + d.deaths)
+                  .style('display', 'block')
+                  .style('left', d3.event.pageX + 20)
+                  .style('top', d3.event.pageY - 20)
+                  // .selectAll()
+                  // .data(d.cases)
+                  // .enter()
+                  // .append('div')
+                  // // .style('color', d => d.color)
+                  // .html(d1.cases);
+              }
+
+              const type = d3.annotationLabel;
+
+              const annotations = [
+                {
+                  note: {
+                    label: "First Covid-19 case detected in US",
+                    title: "01/21/2020",
+                  },
+                  data: { date: "2020-01-21", cases: 1 },
+                  connector: {type: "elbow"},
+                  subject: { radius: 5 },
+                  dy: -400,
+                  dx: 75
+                }
+              ]
+
+              const annotations_02 = [
+                {
+                  note: {
+                    label: "First recorded death in US",
+                    title: "02/29/2020",
+                  },
+                  data: { date: "2020-02-29", deaths: 1 },
+                  connector: {type: "elbow"},
+                  subject: { radius: 5 },
+                  dy: -450,
+                  dx: 125
+                }
+              ]
+
+              const annotations_03 = [
+                {
+                  note: {
+                    label: "Death rate growing rapidly",
+                    title: "May, 2020 - November, 2020",
+                  },
+                  data: { date: "2020-08-01", deaths: 154917 },
+                  connector: {type: "elbow"},
+                  dy: -350,
+                  dx: 60,
+                  subject: { radius: 5 }
+                }
+              ]
+
+              const annotations_04 = [
+                {
+                  note: {
+                    label: "Mass vaccination started in US",
+                    title: "12/14/2020",
+                  },
+                  data: { date: "2020-12-14", cases: 0 },
+                  connector: {type: "elbow"},
+                  dy: -250,
+                  dx: 60,
+                  subject: { radius: 5 }
+                }
+              ]
+
+              const annotations_05 = [
+                {
+                  note: {
+                    label: "50.7% US population received atleast one dose, infection rate going down",
+                    title: "05/31/2021",
+                  },
+                  data: { date: "2021-05-31", cases: 33277912 },
+                  connector: {type: "elbow"},
+                  dy: 85,
+                  dx: -10,
+                  subject: { radius: 5 }
+                }
+              ]
+
+              // Add annotation to the chart
+              const makeAnnotations = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y0(d.cases)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y0.invert(d.y)
+                })
+                .annotations(annotations)
+
+              // Add annotation to the chart
+              const makeAnnotations_02 = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y1(d.deaths)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y1.invert(d.y)
+                })
+                .annotations(annotations_02)
+
+              // Add annotation to the chart
+              const makeAnnotations_03 = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y1(d.deaths)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y1.invert(d.y)
+                })
+                .annotations(annotations_03)
+
+              // Add annotation to the chart
+              const makeAnnotations_04 = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y0(d.cases)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y0.invert(d.y)
+                })
+                .annotations(annotations_04)
+
+              // Add annotation to the chart
+              const makeAnnotations_05 = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y0(d.cases)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y0.invert(d.y)
+                })
+                .annotations(annotations_05)
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations)
+              }, 3000);
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations_02)
+              }, 4500);
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations_03)
+              }, 6000);
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations_04)
+              }, 7500);
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations_05)
+              }, 9000);
+
+          }, 750);      
+
+        }) //CSV parse ends
+
+      } //Function1 ends 
+
+      //2nd Chart            
+      function myFunction2() {
+        removeDivs();
+
+        document.getElementById("but2").style.color = "white";
+        document.getElementById("but3").style.color = "black";
+        document.getElementById("but1").style.color = "black";
+        document.getElementById("but4").style.color = "black";
+        document.getElementById("but5").style.color = "black";
+        document.getElementById("but1").style.background = "#f1f1f1";
+        document.getElementById("but3").style.background = "#f1f1f1";
+        document.getElementById("but4").style.background = "#f1f1f1";
+        document.getElementById("but5").style.background = "#f1f1f1";
+        document.getElementById("but2").style.background = "#666";
+
+        var outer_div = document.createElement("div");
+        outer_div.id = "my_dataviz2_outer";
+        document.getElementById("main").appendChild(outer_div);
+
+        var div_text = document.createElement("div");
+        div_text.id = "my_dataviz2_text";
+        document.getElementById("my_dataviz2_outer").appendChild(div_text);
+
+        var text0 = document.createTextNode("The Cases:");
+        bold = document.createElement('strong');
+        bold.appendChild(text0);
+        document.getElementById("my_dataviz2_text").appendChild(bold);
+
+        var brk0 = document.createElement("br");
+        document.getElementById("my_dataviz2_text").appendChild(brk0);
+
+        var text = document.createTextNode("US has witnessed huge spike in infection rate from May, 2020 to February 2021. On 01/08/2021 US recorded 300,777 cases in a single day. The infection rate has gone down slowly once more and more US residents got vaccinated. We are again seeing a spike in infections starting mid-July, 2021, after vaccination rate got plateaued.");
+        document.getElementById("my_dataviz2_text").appendChild(text);
+
+        var brk = document.createElement("br");
+        document.getElementById("my_dataviz2_text").appendChild(brk);
+        var brk2 = document.createElement("br");
+        document.getElementById("my_dataviz2_text").appendChild(brk2);
+
+        var button1 = document.createElement("button");
+        button1.innerHTML = "Daily Cases";
+        button1.id = "daily_cases";
+
+        var button2 = document.createElement("button");
+        button2.innerHTML = "Seven-day Moving Average";
+        button2.id = "daily_avg_cases";
+
+        document.getElementById("my_dataviz2_outer").appendChild(button1);
+        document.getElementById("my_dataviz2_outer").appendChild( document.createTextNode( '\u00A0' ) );
+        document.getElementById("my_dataviz2_outer").appendChild(button2);
+
+        document.getElementById("daily_cases").setAttribute("class", "btn btn-info");
+        document.getElementById("daily_avg_cases").setAttribute("class", "btn btn-info");
+
+        document.getElementById("daily_cases").style.color = "white";
+        document.getElementById("daily_avg_cases").style.color = "black";
+        document.getElementById("daily_cases").style.background = "#666";
+        document.getElementById("daily_avg_cases").style.background = "#f1f1f1";
+
+        document.getElementById("daily_cases").addEventListener("click", update1);
+        document.getElementById("daily_avg_cases").addEventListener("click", update2);
+
+        document.getElementById("my_dataviz2_outer").appendChild( document.createTextNode( '\u000A' ) );
+        document.getElementById("my_dataviz2_outer").appendChild( document.createTextNode( '\u000A' ) );
+
+        var div = document.createElement("div");
+        div.id = "my_dataviz2";
+        document.getElementById("my_dataviz2_outer").appendChild(div);
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 30, right: 60, bottom: 30, left: 60},
+            width = 1000 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#my_dataviz2")
+          .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Add X axis --> it is a date format
+        var x = d3.scaleTime()
+              .range([ 0, width ]);
+        var xAxis = d3.axisBottom().scale(x);
+        svg.append("g")
+              .attr("transform", "translate(0," + height + ")")
+              .attr("class","myXaxis")
+
+        // Initialize an Y axis
+        var y = d3.scaleLinear().range([height, 0]);
+        var yAxis = d3.axisLeft().scale(y);
+        svg.append("g")
+              .attr("class","myYaxis")        
+
+        //1st button function       
+        function update1() {
+          document.getElementById("daily_cases").style.color = "white";
+          document.getElementById("daily_avg_cases").style.color = "black";
+          // document.getElementById("daily_avg_cases_100").style.color = "black";
+          document.getElementById("daily_cases").style.background = "#666";
+          document.getElementById("daily_avg_cases").style.background = "#f1f1f1";
+          // document.getElementById("daily_avg_cases_100").style.background = "#f1f1f1";
+
+          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+          //Read the data
+          d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us.csv",
+          // When reading the csv, I must format variables:
+          function(d){
+            return { date : d3.timeParse("%Y-%m-%d")(d.date), cases : d.cases}
+          },
+          // Now I can use this dataset:
+          function(data) {
+            // Create the X axis:
+            x.domain(d3.extent(data, function(d) { return d.date; }));
+            svg.selectAll(".myXaxis")
+              // .transition()
+              // .duration(3000)
+              .call(xAxis);
+
+            // create the Y axis
+            y.domain([0, 320000 ]);
+            svg.selectAll(".myYaxis")
+              .transition()
+              .duration(3000)
+              .call(yAxis);
+
+            // Create a update selection: bind to the new data
+            var u = svg.selectAll(".lineTest")
+              .data([data], function(d){ return d.date });  
+
+            // Updata the line
+            u
+              .enter()
+              .append("path")
+              .attr("class","lineTest")
+              .merge(u)
+              .transition()
+              .duration(3000)
+              .attr("d", d3.line()
+                .x(function(d) { return x(d.date); })
+                .y(function(d) { return y(d.cases); }))                
+                .attr("fill", "none")
+                .attr("stroke", "darkseagreen")
+                .attr("stroke-width", 2)
+
+            function plotToolTip (data) {
+                var focus = svg.append("g")
+                    .attr("class", "focus")
+                    .style("display", "none");
+
+                focus.append("line")
+                    .attr("class", "x-hover-line hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", height);
+
+                focus.append("line")
+                    .attr("class", "y-hover-line hover-line")
+                    .attr("x1", width)
+                    .attr("x2", width);
+
+                focus.append("circle")
+                    .attr("r", 5);
+
+                focus.append("text")
+                    .attr("class", "hover-text")
+                    .attr("x", -60)
+                    .attr("dy", "-1em");
+
+                svg.append("rect")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("class", "overlay")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .on("mouseover", function() { focus.style("display", null); })
+                    .on("mouseout", function() { focus.style("display", "none"); })
+                    .on("mousemove", mousemove);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                function mousemove() {
+                  var x0 = x.invert(d3.mouse(this)[0]),
+                      i = bisectDate(data, x0, 1),
+                      d0 = data[i - 1],
+                      d1 = data[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases) + ")");
+                  focus.select("text").text(function() { 
+                    var str = format_date(d.date) + ": " + d.cases;
+                    return str;
+                  });
+                  focus.select(".x-hover-line").attr("y2", height - y(d.cases));
+                  focus.select(".y-hover-line").attr("x2", width + width);
+                }
+
+              }
+
+              plotToolTip(data)
+
+              const annotations = [
+                {
+                  note: {
+                    label: "US Covid-19 cases reach 2 million",
+                    title: "06/10/2020",
+                  },
+                  data: { date: "2020-06-10", cases: 0 },
+                  connector: {type: "elbow"},
+                  subject: { radius: 5 },
+                  dy: -250,
+                  dx: -75
+                }
+              ]
+
+              const annotations_02 = [
+                {
+                  note: {
+                    label: "First known Covid-19 reinfection reported in US",
+                    title: "08/28/2020",
+                  },
+                  data: { date: "2020-08-28", cases: 0 },
+                  connector: {type: "elbow"},
+                  subject: { radius: 5 },
+                  dy: -300,
+                  dx: -50
+                }
+              ]
+
+              const annotations_03 = [
+                {
+                  note: {
+                    label: "US President and First Lady tested positive",
+                    title: "10/02/2020",
+                  },
+                  data: { date: "2020-10-02", cases: 0 },
+                  connector: {type: "elbow"},
+                  subject: { radius: 5 },
+                  dy: -375,
+                  dx: 0
+                }
+              ]
+
+              const annotations_04 = [
+                {
+                  note: {
+                    label: "CDC eases mask guidance for fully vaccinated individuals",
+                    title: "05/13/2021",
+                  },
+                  data: { date: "2021-05-13", cases: 0 },
+                  connector: {type: "elbow"},
+                  subject: { radius: 5 },
+                  dy: -300,
+                  dx: 20
+                }
+              ]
+
+              // Add annotation to the chart
+              const makeAnnotations = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y(d.cases)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y.invert(d.y)
+                })
+                .annotations(annotations)
+
+              // Add annotation to the chart
+              const makeAnnotations_02 = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y(d.cases)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y.invert(d.y)
+                })
+                .annotations(annotations_02)
+
+              // Add annotation to the chart
+              const makeAnnotations_03 = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y(d.cases)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y.invert(d.y)
+                })
+                .annotations(annotations_03)
+
+              // Add annotation to the chart
+              const makeAnnotations_04 = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y(d.cases)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y.invert(d.y)
+                })
+                .annotations(annotations_04)
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations)
+              }, 3000); 
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations_02)
+              }, 4500);   
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations_03)
+              }, 6000);  
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations_04)
+              }, 7500);                 
+        
+        }) //CSV parse ends
+
+        } //1st button function ends 
+
+        //2nd button function       
+        function update2() {
+          document.getElementById("daily_cases").style.color = "black";
+          document.getElementById("daily_avg_cases").style.color = "white";
+          document.getElementById("daily_cases").style.background = "#f1f1f1";
+          document.getElementById("daily_avg_cases").style.background = "#666";
+
+          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+          //Read the data
+          d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us.csv",
+          // When reading the csv, I must format variables:
+          function(d){
+            return { date : d3.timeParse("%Y-%m-%d")(d.date), cases_avg : d.cases_avg}
+          },
+          // Now I can use this dataset:
+          function(data) {
+            // Create the X axis:
+            x.domain(d3.extent(data, function(d) { return d.date; }));
+            svg.selectAll(".myXaxis").transition()
+              .duration(3000)
+              .call(xAxis);
+
+            // create the Y axis
+            y.domain([0, 280000 ]);
+            svg.selectAll(".myYaxis")
+              .transition()
+              .duration(3000)
+              .call(yAxis);
+
+            // Create a update selection: bind to the new data
+            var u = svg.selectAll(".lineTest")
+              .data([data], function(d){ return d.date });  
+
+            // Updata the line
+            u
+              .enter()
+              .append("path")
+              .attr("class","lineTest")
+              .merge(u)
+              .transition()
+              .duration(3000)
+              .attr("d", d3.line()
+                .x(function(d) { return x(d.date); })
+                .y(function(d) { return y(d.cases_avg); }))
+                .attr("fill", "none")
+                .attr("stroke", "olive")
+                .attr("stroke-width", 2) 
+
+            function plotToolTip (data) {
+                var focus = svg.append("g")
+                    .attr("class", "focus")
+                    .style("display", "none");
+
+                focus.append("line")
+                    .attr("class", "x-hover-line hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", height);
+
+                focus.append("line")
+                    .attr("class", "y-hover-line hover-line")
+                    .attr("x1", width)
+                    .attr("x2", width);
+
+                focus.append("circle")
+                    .attr("r", 5);
+
+                focus.append("text")
+                    .attr("class", "hover-text")
+                    .attr("x", -60)
+                    .attr("dy", "-1em");
+
+                svg.append("rect")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("class", "overlay")
+                    // .transition()
+                    // .duration(3000)
+                    .attr("width", width)
+                    .attr("height", height)
+                    .on("mouseover", function() { focus.style("display", null); })
+                    .on("mouseout", function() { focus.style("display", "none"); })
+                    .on("mousemove", mousemove);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                function mousemove() {
+                  var x0 = x.invert(d3.mouse(this)[0]),
+                      i = bisectDate(data, x0, 1),
+                      d0 = data[i - 1],
+                      d1 = data[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases_avg) + ")");
+                  focus.select("text").text(function() { 
+                    var str = format_date(d.date) + ": " + d.cases_avg;
+                    return str;
+                  });
+                  focus.select(".x-hover-line").attr("y2", height - y(d.cases_avg));
+                  focus.select(".y-hover-line").attr("x2", width + width);
+                }
+
+              }
+
+              plotToolTip(data) 
+        
+        })
+
+        } //2nd button function ends
+
+        // setTimeout(function(){
+        //         update1();
+        //       }, 500); 
+
+        update1(); 
+
+      }
+
+      function myFunction3() {
+        removeDivs();
+
+        document.getElementById("but3").style.color = "white";
+        document.getElementById("but1").style.color = "black";
+        document.getElementById("but2").style.color = "black";
+        document.getElementById("but4").style.color = "black";
+        document.getElementById("but5").style.color = "black";
+        document.getElementById("but1").style.background = "#f1f1f1";
+        document.getElementById("but2").style.background = "#f1f1f1";
+        document.getElementById("but4").style.background = "#f1f1f1";
+        document.getElementById("but5").style.background = "#f1f1f1";
+        document.getElementById("but3").style.background = "#666";
+
+        var outer_div = document.createElement("div");
+        outer_div.id = "my_dataviz3_outer";
+        document.getElementById("main").appendChild(outer_div);
+
+        var div_text = document.createElement("div");
+        div_text.id = "my_dataviz3_text";
+        document.getElementById("my_dataviz3_outer").appendChild(div_text);
+
+        var text0 = document.createTextNode("The Deaths:");
+        bold = document.createElement('strong');
+        bold.appendChild(text0);
+        document.getElementById("my_dataviz3_text").appendChild(bold);
+
+        var brk0 = document.createElement("br");
+        document.getElementById("my_dataviz3_text").appendChild(brk0);
+
+        var text = document.createTextNode("Mortality rate was pretty high in US during both the first and second wave of the infections. It has seen a maximum of 2232 deaths (seven-day moving average) on 04/17/2020 during first wave of infections. During the second wave 7-day moving average for death counts maxed at 3351.71 on 01/21/2021.");
+        document.getElementById("my_dataviz3_text").appendChild(text);
+
+        var brk = document.createElement("br");
+        document.getElementById("my_dataviz3_text").appendChild(brk);
+        var brk2 = document.createElement("br");
+        document.getElementById("my_dataviz3_text").appendChild(brk2);
+
+        var button1 = document.createElement("button");
+        button1.innerHTML = "Daily Deaths";
+        button1.id = "daily_deaths";
+
+        var button2 = document.createElement("button");
+        button2.innerHTML = "Seven-day Moving Average";
+        button2.id = "daily_avg_deaths";
+
+        document.getElementById("my_dataviz3_outer").appendChild(button1);
+        document.getElementById("my_dataviz3_outer").appendChild( document.createTextNode( '\u00A0' ) );
+        document.getElementById("my_dataviz3_outer").appendChild(button2);
+
+        document.getElementById("daily_deaths").setAttribute("class", "btn btn-info");
+        document.getElementById("daily_avg_deaths").setAttribute("class", "btn btn-info");
+
+        document.getElementById("daily_deaths").style.color = "white";
+        document.getElementById("daily_avg_deaths").style.color = "black";
+        document.getElementById("daily_deaths").style.background = "#666";
+        document.getElementById("daily_avg_deaths").style.background = "#f1f1f1";
+
+        document.getElementById("daily_deaths").addEventListener("click", update1);
+        document.getElementById("daily_avg_deaths").addEventListener("click", update2);
+
+        document.getElementById("my_dataviz3_outer").appendChild( document.createTextNode( '\u000A' ) );
+        document.getElementById("my_dataviz3_outer").appendChild( document.createTextNode( '\u000A' ) );
+
+        var div = document.createElement("div");
+        div.id = "my_dataviz3";
+        document.getElementById("my_dataviz3_outer").appendChild(div);
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 30, right: 60, bottom: 30, left: 60},
+            width = 1000 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#my_dataviz3")
+          .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Add X axis --> it is a date format
+        var x = d3.scaleTime()
+              .range([ 0, width ]);
+        var xAxis = d3.axisBottom().scale(x);
+        svg.append("g")
+              .attr("transform", "translate(0," + height + ")")
+              .attr("class","myXaxis")
+
+        // Initialize an Y axis
+        var y = d3.scaleLinear().range([height, 0]);
+        var yAxis = d3.axisLeft().scale(y);
+        svg.append("g")
+              .attr("class","myYaxis")        
+
+        //1st button function       
+        function update1() {
+          document.getElementById("daily_deaths").style.color = "white";
+          document.getElementById("daily_avg_deaths").style.color = "black";
+          // document.getElementById("daily_avg_deaths_100").style.color = "black";
+          document.getElementById("daily_deaths").style.background = "#666";
+          document.getElementById("daily_avg_deaths").style.background = "#f1f1f1";
+          // document.getElementById("daily_avg_deaths_100").style.background = "#f1f1f1";
+
+          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+          //Read the data
+          d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us.csv",
+          // When reading the csv, I must format variables:
+          function(d){
+            return { date : d3.timeParse("%Y-%m-%d")(d.date), deaths : d.deaths}
+          },
+          // Now I can use this dataset:
+          function(data) {
+            // Create the X axis:
+            x.domain(d3.extent(data, function(d) { return d.date; }));
+            svg.selectAll(".myXaxis")
+              .call(xAxis);
+
+            // console.log(d3.max(data, function(d) { return d.cases  }))
+
+            // create the Y axis
+            y.domain([0, 5500 ]);
+            svg.selectAll(".myYaxis")
+              .transition()
+              .duration(3000)
+              .call(yAxis);
+
+            // Create a update selection: bind to the new data
+            var u = svg.selectAll(".lineTest")
+              .data([data], function(d){ return d.date });  
+
+            // Updata the line
+            u
+              .enter()
+              .append("path")
+              .attr("class","lineTest")
+              .merge(u)
+              .transition()
+              .duration(3000)
+              .attr("d", d3.line()
+                .x(function(d) { return x(d.date); })
+                .y(function(d) { return y(d.deaths); }))
+                .attr("fill", "none")
+                .attr("stroke", "salmon")
+                .attr("stroke-width", 2)  
+
+
+            function plotToolTip (data) {
+                var focus = svg.append("g")
+                    .attr("class", "focus")
+                    .style("display", "none");
+
+                focus.append("line")
+                    .attr("class", "x-hover-line hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", height);
+
+                focus.append("line")
+                    .attr("class", "y-hover-line hover-line")
+                    .attr("x1", width)
+                    .attr("x2", width);
+
+                focus.append("circle")
+                    .attr("r", 5);
+
+                focus.append("text")
+                    .attr("class", "hover-text")
+                    .attr("x", -60)
+                    .attr("dy", "-1em");
+
+                svg.append("rect")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("class", "overlay")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .on("mouseover", function() { focus.style("display", null); })
+                    .on("mouseout", function() { focus.style("display", "none"); })
+                    .on("mousemove", mousemove);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                function mousemove() {
+                  var x0 = x.invert(d3.mouse(this)[0]),
+                      i = bisectDate(data, x0, 1),
+                      d0 = data[i - 1],
+                      d1 = data[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths) + ")");
+                  focus.select("text").text(function() { 
+                    var str = format_date(d.date) + ": " + d.deaths;
+                    return str;
+                  });
+                  focus.select(".x-hover-line").attr("y2", height - y(d.deaths));
+                  focus.select(".y-hover-line").attr("x2", width + width);
+                }
+
+              }
+
+              plotToolTip(data)
+
+              const annotations = [
+                {
+                  note: {
+                    label: "US Covid-19 deaths cross 100,000",
+                    title: "05/27/2020",
+                    // align: "middle",
+                    // lineType: "vertical"
+                  },
+                  data: { date: "2020-05-27", deaths: 0 },
+                  connector: {type: "elbow"},
+                  subject: { radius: 5 },
+                  // className: "show-bg",
+                  dy: -300,
+                  dx: -75
+                }
+              ]
+
+              const annotations_02 = [
+                {
+                  note: {
+                    label: "Covid-19 now the 3rd leading cause of death in the US",
+                    title: "08/17/2020",
+                    // align: "middle",
+                    // lineType: "vertical"
+                  },
+                  data: { date: "2020-08-17", deaths: 0 },
+                  connector: {type: "elbow"},
+                  subject: { radius: 5 },
+                  // className: "show-bg",
+                  dy: -375,
+                  dx: -50
+                }
+              ]
+
+              const annotations_03 = [
+                {
+                  note: {
+                    label: "1 out of 1000 Americans died from Covid-19",
+                    title: "12/26/2020",
+                    // align: "middle",
+                    // lineType: "vertical"
+                  },
+                  data: { date: "2020-12-26", deaths: 0 },
+                  connector: {type: "elbow"},
+                  subject: { radius: 5 },
+                  // className: "show-bg",
+                  dy: -350,
+                  dx: -20
+                }
+              ]
+
+              const annotations_04 = [
+                {
+                  note: {
+                    label: "Death toll surpasses 600,000 mark",
+                    title: "06/15/2021",
+                    // align: "middle",
+                    // lineType: "vertical"
+                  },
+                  data: { date: "2021-06-15", deaths: 0 },
+                  connector: {type: "elbow"},
+                  subject: { radius: 5 },
+                  // className: "show-bg",
+                  dy: -300,
+                  dx: 0
+                }
+              ]
+
+              // Add annotation to the chart
+              const makeAnnotations = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y(d.deaths)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y.invert(d.y)
+                })
+                .annotations(annotations)
+
+              // Add annotation to the chart
+              const makeAnnotations_02 = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y(d.deaths)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y.invert(d.y)
+                })
+                .annotations(annotations_02)
+
+              // Add annotation to the chart
+              const makeAnnotations_03 = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y(d.deaths)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y.invert(d.y)
+                })
+                .annotations(annotations_03)
+
+              // Add annotation to the chart
+              const makeAnnotations_04 = d3.annotation()
+                .editMode(true)
+                .type(d3.annotationCalloutCircle)
+                .accessors({
+                  x: d => x(d3.timeParse("%Y-%m-%d")(d.date)),
+                  y: d => y(d.deaths)
+                })
+                .accessorsInverse({
+                   date: d => timeFormat(x.invert(d.x)),
+                   close: d => y.invert(d.y)
+                })
+                .annotations(annotations_04)
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations)
+              }, 3000); 
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations_02)
+              }, 4500);   
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations_03)
+              }, 6000);  
+
+              setTimeout(function(){
+                svg
+              .append("g")
+                .attr("class", "annotation-group")
+                .call(makeAnnotations_04)
+              }, 7500);                  
+        
+        }) //CSV parse ends
+
+        } //1st button function ends 
+
+        //2nd button function       
+        function update2() {
+          document.getElementById("daily_deaths").style.color = "black";
+          document.getElementById("daily_avg_deaths").style.color = "white";
+          document.getElementById("daily_deaths").style.background = "#f1f1f1";
+          document.getElementById("daily_avg_deaths").style.background = "#666";
+
+          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+          //Read the data
+          d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us.csv",
+          // When reading the csv, I must format variables:
+          function(d){
+            return { date : d3.timeParse("%Y-%m-%d")(d.date), deaths_avg : d.deaths_avg}
+          },
+          // Now I can use this dataset:
+          function(data) {
+            // Create the X axis:
+            x.domain(d3.extent(data, function(d) { return d.date; }));
+            svg.selectAll(".myXaxis")
+              .call(xAxis);
+
+            // console.log(d3.max(data, function(d) { return d.cases  }))
+
+            // create the Y axis
+            y.domain([0, 3700 ]);
+            svg.selectAll(".myYaxis")
+              .transition()
+              .duration(3000)
+              .call(yAxis);
+
+            // Create a update selection: bind to the new data
+            var u = svg.selectAll(".lineTest")
+              .data([data], function(d){ return d.date });  
+
+            // Updata the line
+            u
+              .enter()
+              .append("path")
+              .attr("class","lineTest")
+              .merge(u)
+              .transition()
+              .duration(3000)
+              .attr("d", d3.line()
+                .x(function(d) { return x(d.date); })
+                .y(function(d) { return y(d.deaths_avg); }))
+                .attr("fill", "none")
+                .attr("stroke", "indianred")
+                .attr("stroke-width", 2)  
+
+            function plotToolTip (data) {
+                var focus = svg.append("g")
+                    .attr("class", "focus")
+                    .style("display", "none");
+
+                focus.append("line")
+                    .attr("class", "x-hover-line hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", height);
+
+                focus.append("line")
+                    .attr("class", "y-hover-line hover-line")
+                    .attr("x1", width)
+                    .attr("x2", width);
+
+                focus.append("circle")
+                    .attr("r", 5);
+
+                focus.append("text")
+                    .attr("class", "hover-text")
+                    .attr("x", -60)
+                    .attr("dy", "-1em");
+
+                svg.append("rect")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("class", "overlay")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .on("mouseover", function() { focus.style("display", null); })
+                    .on("mouseout", function() { focus.style("display", "none"); })
+                    .on("mousemove", mousemove);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                function mousemove() {
+                  var x0 = x.invert(d3.mouse(this)[0]),
+                      i = bisectDate(data, x0, 1),
+                      d0 = data[i - 1],
+                      d1 = data[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths_avg) + ")");
+                  focus.select("text").text(function() { 
+                    var str = format_date(d.date) + ": " + d.deaths_avg;
+                    return str;
+                  });
+                  focus.select(".x-hover-line").attr("y2", height - y(d.deaths_avg));
+                  focus.select(".y-hover-line").attr("x2", width + width);
+                }
+
+              }
+
+              plotToolTip(data)                   
+        
+        })    
+
+        } //2nd button function ends
+
+        // setTimeout(function(){
+        //         update1();
+        //       }, 500); 
+
+        update1();     
+
+      }
+
+      function myFunction4() {
+        removeDivs();
+
+        document.getElementById("but4").style.color = "white";
+        document.getElementById("but1").style.color = "black";
+        document.getElementById("but2").style.color = "black";
+        document.getElementById("but3").style.color = "black";
+        document.getElementById("but5").style.color = "black";
+        document.getElementById("but1").style.background = "#f1f1f1";
+        document.getElementById("but2").style.background = "#f1f1f1";
+        document.getElementById("but3").style.background = "#f1f1f1";
+        document.getElementById("but5").style.background = "#f1f1f1";
+        document.getElementById("but4").style.background = "#666";
+
+        var outer_div = document.createElement("div");
+        outer_div.id = "my_dataviz4_outer";
+        document.getElementById("main").appendChild(outer_div);
+
+        var div_text = document.createElement("div");
+        div_text.id = "my_dataviz4_text";
+        document.getElementById("my_dataviz4_outer").appendChild(div_text);
+
+        var text0 = document.createTextNode("Case counts in different States:");
+        bold = document.createElement('strong');
+        bold.appendChild(text0);
+        document.getElementById("my_dataviz4_text").appendChild(bold);
+
+        var brk0 = document.createElement("br");
+        document.getElementById("my_dataviz4_text").appendChild(brk0);
+
+        var text = document.createTextNode("All US states witnessed significat impact due to Covid-19. States with the higher population like California, Texas, Florida, New York were the most impacted ones.");
+        document.getElementById("my_dataviz4_text").appendChild(text);
+
+        var brk = document.createElement("br");
+        document.getElementById("my_dataviz4_text").appendChild(brk);
+        var brk2 = document.createElement("br");
+        document.getElementById("my_dataviz4_text").appendChild(brk2);
+
+        var button1 = document.createElement("button");
+        button1.innerHTML = "Daily Cases";
+        button1.id = "daily_cases";
+
+        var button2 = document.createElement("button");
+        button2.innerHTML = "Seven-day Moving Average";
+        button2.id = "daily_avg_cases";
+
+        document.getElementById("my_dataviz4_outer").appendChild(button1);
+        document.getElementById("my_dataviz4_outer").appendChild( document.createTextNode( '\u00A0' ) );
+        document.getElementById("my_dataviz4_outer").appendChild(button2);
+
+        document.getElementById("daily_cases").setAttribute("class", "btn btn-info");
+        document.getElementById("daily_avg_cases").setAttribute("class", "btn btn-info");
+
+        document.getElementById("daily_cases").style.color = "white";
+        document.getElementById("daily_avg_cases").style.color = "black";
+        document.getElementById("daily_cases").style.background = "#666";
+        document.getElementById("daily_avg_cases").style.background = "#f1f1f1";
+
+        document.getElementById("daily_cases").addEventListener("click", update1);
+        document.getElementById("daily_avg_cases").addEventListener("click", update2);
+
+        document.getElementById("my_dataviz4_outer").appendChild( document.createTextNode( '\u000A' ) );
+        document.getElementById("my_dataviz4_outer").appendChild( document.createTextNode( '\u000A' ) );
+
+        var brk = document.createElement("br");
+        document.getElementById("my_dataviz4_outer").appendChild(brk);
+        var brk2 = document.createElement("br");
+        document.getElementById("my_dataviz4_outer").appendChild(brk2);
+
+        var selectButton = document.createElement("select");
+        selectButton.id = "selectButton";
+        document.getElementById("my_dataviz4_outer").appendChild(selectButton);
+
+        document.getElementById("my_dataviz4_outer").appendChild( document.createTextNode( '\u000A' ) );
+        document.getElementById("my_dataviz4_outer").appendChild( document.createTextNode( '\u000A' ) );
+
+        var div = document.createElement("div");
+        div.id = "my_dataviz4";
+        document.getElementById("my_dataviz4_outer").appendChild(div);
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 30, right: 60, bottom: 30, left: 60},
+            width = 1000 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#my_dataviz4")
+          .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Add X axis --> it is a date format
+        var x = d3.scaleTime()
+              .range([ 0, width ]);
+        var xAxis = d3.axisBottom().scale(x);
+        svg.append("g")
+              .attr("transform", "translate(0," + height + ")")
+              .attr("class","myXaxis")
+
+        // Initialize an Y axis
+        var y = d3.scaleLinear().range([height, 0]);
+        var yAxis = d3.axisLeft().scale(y);
+        svg.append("g")
+           .attr("class","myYaxis")
+
+        update1();
+
+        function update1() {
+          document.getElementById("daily_cases").style.color = "white";
+          document.getElementById("daily_avg_cases").style.color = "black";
+          document.getElementById("daily_cases").style.background = "#666";
+          document.getElementById("daily_avg_cases").style.background = "#f1f1f1";
+
+          d3.selectAll("path").remove();
+
+          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+          //Read the data
+          d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us-states.csv", 
+            // When reading the csv, I must format variables:
+            function(d){
+              return { date : d3.timeParse("%Y-%m-%d")(d.date), cases : d.cases, state : d.state }
+            },
+
+            function(data) {
+              var allGroup = d3.map(data, function(d){return(d.state)}).keys();
+              allGroup.sort();
+              console.log(allGroup);
+
+              // add the options to the button
+              d3.select("#selectButton")
+                .selectAll('myOptions')
+                .data(allGroup)
+                .enter()
+                .append('option')
+                .text(function (d) { return d; }) // text showed in the menu
+                .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+              // A color scale: one color for each group
+              var myColor = d3.scaleOrdinal()
+                .domain(allGroup)
+                .range(["#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", "#437e8a", "#ff7463", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", "#fe6616", "#7a7352", "#f9bc0f", "#b65d66", "#07a2e6", "#c091ae", "#8a91a7", "#88fc07", "#d47270", "#9e8010", "#10b437", "#cf7c97", "#f92b75", "#07c99d", "#a946aa", "#bfd544", "#16977e", "#ff6ac8", "#a88178", "#5776a9", "#678007", "#fa9316", "#85c070", "#6aa2a9", "#989e5d", "#fe9169", "#cd714a", "#6ed014", "#c5639c", "#c23271", "#d7908c", "#678275", "#c5a121", "#a978ba", "#ee534e", "#d24506", "#59c3fa", "#ca7b0a"]);
+
+              
+              function returnDatum(group) {
+                var newData = [];
+                for (let i = 0; i < data.length; i++) {
+                  if (data[i].state == group){
+                    newData.push(data[i]);
+                  }                  
+                }
+                return newData;
+              }
+
+              x.domain(d3.extent(data, function(d) { return d.date; }));
+              svg.selectAll(".myXaxis")
+                // .transition()
+                // .duration(3000)
+                .call(xAxis);
+
+              var currentlySelectedOption = d3.select("#selectButton").property("value");
+
+              y.domain([0, d3.max(returnDatum(currentlySelectedOption), function(d) { return +d.cases;  }) ]);
+                svg.selectAll(".myYaxis")
+                  .transition()
+                  .duration(1500)
+                  .call(yAxis);
+
+              // Initialize line with first group of the list
+              var line = svg
+                .append('g')
+                .append("path")
+                  .datum(returnDatum(currentlySelectedOption))
+                  // .transition()
+                  // .duration(1000)
+                  .attr("d", d3.line()
+                    .x(function(d) { return x(d.date) })
+                    .y(function(d) { return y(+d.cases) })
+                  )
+                  .attr("stroke", function(d){ return myColor(currentlySelectedOption) })
+                  .style("stroke-width", 2)
+                  .style("fill", "none")
+
+              function plotToolTip (value) {
+                var focus = svg.append("g")
+                    .attr("class", "focus")
+                    .style("display", "none");
+
+                focus.append("line")
+                    .attr("class", "x-hover-line hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", height);
+
+                focus.append("line")
+                    .attr("class", "y-hover-line hover-line")
+                    .attr("x1", width)
+                    .attr("x2", width);
+
+                focus.append("circle")
+                    .attr("r", 5);
+
+                focus.append("text")
+                    .attr("class", "hover-text")
+                    .attr("x", -60)
+                    .attr("dy", "-1em");
+
+                svg.append("rect")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("class", "overlay")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .on("mouseover", function() { focus.style("display", null); })
+                    .on("mouseout", function() { focus.style("display", "none"); })
+                    .on("mousemove", mousemove);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                function mousemove() {
+                  var x0 = x.invert(d3.mouse(this)[0]),
+                      i = bisectDate(returnDatum(value), x0, 1),
+                      d0 = returnDatum(value)[i - 1],
+                      d1 = returnDatum(value)[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases) + ")");
+                  focus.select("text").text(function() { 
+                    var str = format_date(d.date) + ": " + d.cases;
+                    return str;
+                  });
+                  focus.select(".x-hover-line").attr("y2", height - y(d.cases));
+                  focus.select(".y-hover-line").attr("x2", width + width);
+                }
+
+              }
+
+              plotToolTip(currentlySelectedOption)
+
+
+
+              // A function that update the chart
+              function update(selectedGroup) {
+
+                // create the Y axis
+                y.domain([0, d3.max(returnDatum(selectedGroup), function(d) { return +d.cases;  }) ]);
+                svg.selectAll(".myYaxis")
+                  .transition()
+                  .duration(1500)
+                  .call(yAxis);
+
+                // Create new data with the selection?
+                var dataFilter = data.filter(function(d){return d.state==selectedGroup})
+
+                // Give these new data to update line
+                line
+                    .datum(dataFilter)
+                    .transition()
+                    .duration(3000)
+                    .attr("d", d3.line()
+                      .x(function(d) { return x(d.date) })
+                      .y(function(d) { return y(+d.cases) })
+                    )
+                    .attr("stroke", function(d){ return myColor(selectedGroup) })
+
+              }
+
+              // When the button is changed, run the updateChart function
+              d3.select("#selectButton").on("change", function(d) {
+                  // recover the option that has been chosen
+                  var selectedOption = d3.select(this).property("value")
+                  // run the updateChart function with this selected option
+                  update(selectedOption)
+                  setTimeout(function(){
+                    plotToolTip(selectedOption)
+                  }, 1500); 
+                  // plotToolTip(selectedOption)
+              })
+
+          })
+
+        }
+
+        function update2() {
+          document.getElementById("daily_cases").style.color = "black";
+          document.getElementById("daily_avg_cases").style.color = "white";
+          document.getElementById("daily_cases").style.background = "#f1f1f1";
+          document.getElementById("daily_avg_cases").style.background = "#666";
+
+          d3.selectAll("path").remove();
+
+          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+          //Read the data
+          d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us-states.csv", 
+            // When reading the csv, I must format variables:
+            function(d){
+              return { date : d3.timeParse("%Y-%m-%d")(d.date), cases_avg : d.cases_avg, state : d.state }
+            },
+
+            function(data) {
+              var allGroup = d3.map(data, function(d){return(d.state)}).keys();
+              allGroup.sort();
+              console.log(allGroup);
+
+              // add the options to the button
+              d3.select("#selectButton")
+                .selectAll('myOptions')
+                .data(allGroup)
+                .enter()
+                .append('option')
+                .text(function (d) { return d; }) // text showed in the menu
+                .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+              // A color scale: one color for each group
+              var myColor = d3.scaleOrdinal()
+                .domain(allGroup)
+                .range(["#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", "#437e8a", "#ff7463", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", "#fe6616", "#7a7352", "#f9bc0f", "#b65d66", "#07a2e6", "#c091ae", "#8a91a7", "#88fc07", "#d47270", "#9e8010", "#10b437", "#cf7c97", "#f92b75", "#07c99d", "#a946aa", "#bfd544", "#16977e", "#ff6ac8", "#a88178", "#5776a9", "#678007", "#fa9316", "#85c070", "#6aa2a9", "#989e5d", "#fe9169", "#cd714a", "#6ed014", "#c5639c", "#c23271", "#d7908c", "#678275", "#c5a121", "#a978ba", "#ee534e", "#d24506", "#59c3fa", "#ca7b0a"]);
+
+              
+              function returnDatum(group) {
+                var newData = [];
+                for (let i = 0; i < data.length; i++) {
+                  if (data[i].state == group){
+                    newData.push(data[i]);
+                  }                  
+                }
+                return newData;
+              }
+
+              x.domain(d3.extent(data, function(d) { return d.date; }));
+              svg.selectAll(".myXaxis")
+                // .transition()
+                // .duration(3000)
+                .call(xAxis);
+
+              var currentlySelectedOption = d3.select("#selectButton").property("value");
+
+              y.domain([0, d3.max(returnDatum(currentlySelectedOption), function(d) { return +d.cases_avg;  }) ]);
+                svg.selectAll(".myYaxis")
+                  .transition()
+                  .duration(1500)
+                  .call(yAxis);
+
+
+
+              // Initialize line with first group of the list
+              var line = svg
+                .append('g')
+                .append("path")
+                  .datum(returnDatum(currentlySelectedOption))
+                  // .transition()
+                  // .duration(1000)
+                  .attr("d", d3.line()
+                    .x(function(d) { return x(d.date) })
+                    .y(function(d) { return y(+d.cases_avg) })
+                  )
+                  .attr("stroke", function(d){ return myColor(currentlySelectedOption) })
+                  .style("stroke-width", 2)
+                  .style("fill", "none")
+
+              function plotToolTip (value) {
+                var focus = svg.append("g")
+                    .attr("class", "focus")
+                    .style("display", "none");
+
+                focus.append("line")
+                    .attr("class", "x-hover-line hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", height);
+
+                focus.append("line")
+                    .attr("class", "y-hover-line hover-line")
+                    .attr("x1", width)
+                    .attr("x2", width);
+
+                focus.append("circle")
+                    .attr("r", 5);
+
+                focus.append("text")
+                    .attr("class", "hover-text")
+                    .attr("x", -60)
+                    .attr("dy", "-1em");
+
+                svg.append("rect")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("class", "overlay")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .on("mouseover", function() { focus.style("display", null); })
+                    .on("mouseout", function() { focus.style("display", "none"); })
+                    .on("mousemove", mousemove);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                function mousemove() {
+                  var x0 = x.invert(d3.mouse(this)[0]),
+                      i = bisectDate(returnDatum(value), x0, 1),
+                      d0 = returnDatum(value)[i - 1],
+                      d1 = returnDatum(value)[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases_avg) + ")");
+                  focus.select("text").text(function() { 
+                    var str = format_date(d.date) + ": " + d.cases_avg;
+                    return str;
+                  });
+                  focus.select(".x-hover-line").attr("y2", height - y(d.cases_avg));
+                  focus.select(".y-hover-line").attr("x2", width + width);
+                }
+
+              }
+
+              plotToolTip(currentlySelectedOption)
+
+
+
+              
+              // A function that update the chart
+              function update(selectedGroup) {
+
+                // create the Y axis
+                y.domain([0, d3.max(returnDatum(selectedGroup), function(d) { return +d.cases_avg;  }) ]);
+                svg.selectAll(".myYaxis")
+                  .transition()
+                  .duration(1500)
+                  .call(yAxis);
+
+                // Create new data with the selection?
+                var dataFilter = data.filter(function(d){return d.state==selectedGroup})
+
+                // Give these new data to update line
+                line
+                    .datum(dataFilter)
+                    .transition()
+                    .duration(3000)
+                    .attr("d", d3.line()
+                      .x(function(d) { return x(d.date) })
+                      .y(function(d) { return y(+d.cases_avg) })
+                    )
+                    .attr("stroke", function(d){ return myColor(selectedGroup) })
+              }
+
+              // When the button is changed, run the updateChart function
+              d3.select("#selectButton").on("change", function(d) {
+                  // recover the option that has been chosen
+                  var selectedOption = d3.select(this).property("value")
+                  // run the updateChart function with this selected option
+                  update(selectedOption)
+                  setTimeout(function(){
+                    plotToolTip(selectedOption)
+                  }, 1500); 
+                  // plotToolTip(selectedOption)
+              })
+
+          })
+          
+        }
+
+      }
+
+      function myFunction5() {
+        removeDivs();
+
+        document.getElementById("but5").style.color = "white";
+        document.getElementById("but1").style.color = "black";
+        document.getElementById("but2").style.color = "black";
+        document.getElementById("but3").style.color = "black";
+        document.getElementById("but4").style.color = "black";
+        document.getElementById("but1").style.background = "#f1f1f1";
+        document.getElementById("but2").style.background = "#f1f1f1";
+        document.getElementById("but3").style.background = "#f1f1f1";
+        document.getElementById("but4").style.background = "#f1f1f1";
+        document.getElementById("but5").style.background = "#666";
+
+        var outer_div = document.createElement("div");
+        outer_div.id = "my_dataviz5_outer";
+        document.getElementById("main").appendChild(outer_div);
+
+        var div_text = document.createElement("div");
+        div_text.id = "my_dataviz5_text";
+        document.getElementById("my_dataviz5_outer").appendChild(div_text);
+
+        var text0 = document.createTextNode("Death counts in different States:");
+        bold = document.createElement('strong');
+        bold.appendChild(text0);
+        document.getElementById("my_dataviz5_text").appendChild(bold);
+
+        var brk0 = document.createElement("br");
+        document.getElementById("my_dataviz5_text").appendChild(brk0);
+
+        var text = document.createTextNode("Death rate was pretty high in most of the US states. States like New Jersy, New York, Massachusetts recorded most number of deaths per 100K of population.");
+        document.getElementById("my_dataviz5_text").appendChild(text);
+
+        var brk = document.createElement("br");
+        document.getElementById("my_dataviz5_text").appendChild(brk);
+        var brk2 = document.createElement("br");
+        document.getElementById("my_dataviz5_text").appendChild(brk2);
+
+        var button1 = document.createElement("button");
+        button1.innerHTML = "Daily Deaths";
+        button1.id = "daily_deaths";
+
+        var button2 = document.createElement("button");
+        button2.innerHTML = "Seven-day Moving Average";
+        button2.id = "daily_avg_deaths";
+
+        document.getElementById("my_dataviz5_outer").appendChild(button1);
+        document.getElementById("my_dataviz5_outer").appendChild( document.createTextNode( '\u00A0' ) );
+        document.getElementById("my_dataviz5_outer").appendChild(button2);
+
+        document.getElementById("daily_deaths").setAttribute("class", "btn btn-info");
+        document.getElementById("daily_avg_deaths").setAttribute("class", "btn btn-info");
+
+        document.getElementById("daily_deaths").style.color = "white";
+        document.getElementById("daily_avg_deaths").style.color = "black";
+        document.getElementById("daily_deaths").style.background = "#666";
+        document.getElementById("daily_avg_deaths").style.background = "#f1f1f1";
+
+        document.getElementById("daily_deaths").addEventListener("click", update1);
+        document.getElementById("daily_avg_deaths").addEventListener("click", update2);
+
+        document.getElementById("my_dataviz5_outer").appendChild( document.createTextNode( '\u000A' ) );
+        document.getElementById("my_dataviz5_outer").appendChild( document.createTextNode( '\u000A' ) );
+
+        var brk = document.createElement("br");
+        document.getElementById("my_dataviz5_outer").appendChild(brk);
+        var brk2 = document.createElement("br");
+        document.getElementById("my_dataviz5_outer").appendChild(brk2);
+
+        var selectButton = document.createElement("select");
+        selectButton.id = "selectButton";
+        document.getElementById("my_dataviz5_outer").appendChild(selectButton);
+
+        document.getElementById("my_dataviz5_outer").appendChild( document.createTextNode( '\u000A' ) );
+        document.getElementById("my_dataviz5_outer").appendChild( document.createTextNode( '\u000A' ) );
+
+        var div = document.createElement("div");
+        div.id = "my_dataviz5";
+        document.getElementById("my_dataviz5_outer").appendChild(div);
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 30, right: 60, bottom: 30, left: 60},
+            width = 1000 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#my_dataviz5")
+          .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Add X axis --> it is a date format
+        var x = d3.scaleTime()
+              .range([ 0, width ]);
+        var xAxis = d3.axisBottom().scale(x);
+        svg.append("g")
+              .attr("transform", "translate(0," + height + ")")
+              .attr("class","myXaxis")
+
+        // Initialize an Y axis
+        var y = d3.scaleLinear().range([height, 0]);
+        var yAxis = d3.axisLeft().scale(y);
+        svg.append("g")
+           .attr("class","myYaxis")
+
+        update1();
+
+        function update1() {
+          document.getElementById("daily_deaths").style.color = "white";
+          document.getElementById("daily_avg_deaths").style.color = "black";
+          document.getElementById("daily_deaths").style.background = "#666";
+          document.getElementById("daily_avg_deaths").style.background = "#f1f1f1";
+
+          d3.selectAll("path").remove();
+
+          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+          //Read the data
+          d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us-states.csv", 
+            // When reading the csv, I must format variables:
+            function(d){
+              return { date : d3.timeParse("%Y-%m-%d")(d.date), deaths : d.deaths, state : d.state }
+            },
+
+            function(data) {
+              var allGroup = d3.map(data, function(d){return(d.state)}).keys();
+              allGroup.sort();
+              console.log(allGroup);
+
+              // add the options to the button
+              d3.select("#selectButton")
+                .selectAll('myOptions')
+                .data(allGroup)
+                .enter()
+                .append('option')
+                .text(function (d) { return d; }) // text showed in the menu
+                .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+              // A color scale: one color for each group
+              var myColor = d3.scaleOrdinal()
+                .domain(allGroup)
+                .range(["#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", "#437e8a", "#ff7463", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", "#fe6616", "#7a7352", "#f9bc0f", "#b65d66", "#07a2e6", "#c091ae", "#8a91a7", "#88fc07", "#d47270", "#9e8010", "#10b437", "#cf7c97", "#f92b75", "#07c99d", "#a946aa", "#bfd544", "#16977e", "#ff6ac8", "#a88178", "#5776a9", "#678007", "#fa9316", "#85c070", "#6aa2a9", "#989e5d", "#fe9169", "#cd714a", "#6ed014", "#c5639c", "#c23271", "#d7908c", "#678275", "#c5a121", "#a978ba", "#ee534e", "#d24506", "#59c3fa", "#ca7b0a"]);
+
+              
+              function returnDatum(group) {
+                var newData = [];
+                for (let i = 0; i < data.length; i++) {
+                  if (data[i].state == group){
+                    newData.push(data[i]);
+                  }                  
+                }
+                return newData;
+              }
+
+              x.domain(d3.extent(data, function(d) { return d.date; }));
+              svg.selectAll(".myXaxis")
+                // .transition()
+                // .duration(3000)
+                .call(xAxis);
+
+              var currentlySelectedOption = d3.select("#selectButton").property("value");
+
+              y.domain([0, d3.max(returnDatum(currentlySelectedOption), function(d) { return +d.deaths;  }) ]);
+                svg.selectAll(".myYaxis")
+                  .transition()
+                  .duration(1500)
+                  .call(yAxis);
+
+              // Initialize line with first group of the list
+              var line = svg
+                .append('g')
+                .append("path")
+                  .datum(returnDatum(currentlySelectedOption))
+                  // .transition()
+                  // .duration(1000)
+                  .attr("d", d3.line()
+                    .x(function(d) { return x(d.date) })
+                    .y(function(d) { return y(+d.deaths) })
+                  )
+                  .attr("stroke", function(d){ return myColor(currentlySelectedOption) })
+                  .style("stroke-width", 2)
+                  .style("fill", "none")
+
+              function plotToolTip (value) {
+                var focus = svg.append("g")
+                    .attr("class", "focus")
+                    .style("display", "none");
+
+                focus.append("line")
+                    .attr("class", "x-hover-line hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", height);
+
+                focus.append("line")
+                    .attr("class", "y-hover-line hover-line")
+                    .attr("x1", width)
+                    .attr("x2", width);
+
+                focus.append("circle")
+                    .attr("r", 5);
+
+                focus.append("text")
+                    .attr("class", "hover-text")
+                    .attr("x", -60)
+                    .attr("dy", "-1em");
+
+                svg.append("rect")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("class", "overlay")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .on("mouseover", function() { focus.style("display", null); })
+                    .on("mouseout", function() { focus.style("display", "none"); })
+                    .on("mousemove", mousemove);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                function mousemove() {
+                  var x0 = x.invert(d3.mouse(this)[0]),
+                      i = bisectDate(returnDatum(value), x0, 1),
+                      d0 = returnDatum(value)[i - 1],
+                      d1 = returnDatum(value)[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths) + ")");
+                  focus.select("text").text(function() { 
+                    var str = format_date(d.date) + ": " + d.deaths;
+                    return str;
+                  });
+                  focus.select(".x-hover-line").attr("y2", height - y(d.deaths));
+                  focus.select(".y-hover-line").attr("x2", width + width);
+                }
+
+              }
+
+              plotToolTip(currentlySelectedOption)
+
+
+
+              // A function that update the chart
+              function update(selectedGroup) {
+
+                // create the Y axis
+                y.domain([0, d3.max(returnDatum(selectedGroup), function(d) { return +d.deaths;  }) ]);
+                svg.selectAll(".myYaxis")
+                  .transition()
+                  .duration(1500)
+                  .call(yAxis);
+
+                // Create new data with the selection?
+                var dataFilter = data.filter(function(d){return d.state==selectedGroup})
+
+                // Give these new data to update line
+                line
+                    .datum(dataFilter)
+                    .transition()
+                    .duration(3000)
+                    .attr("d", d3.line()
+                      .x(function(d) { return x(d.date) })
+                      .y(function(d) { return y(+d.deaths) })
+                    )
+                    .attr("stroke", function(d){ return myColor(selectedGroup) })
+
+              }
+
+              // When the button is changed, run the updateChart function
+              d3.select("#selectButton").on("change", function(d) {
+                  // recover the option that has been chosen
+                  var selectedOption = d3.select(this).property("value")
+                  // run the updateChart function with this selected option
+                  update(selectedOption)
+                  setTimeout(function(){
+                    plotToolTip(selectedOption)
+                  }, 1500); 
+                  // plotToolTip(selectedOption)
+              })
+
+          })
+
+        }
+
+        function update2() {
+          document.getElementById("daily_deaths").style.color = "black";
+          document.getElementById("daily_avg_deaths").style.color = "white";
+          document.getElementById("daily_deaths").style.background = "#f1f1f1";
+          document.getElementById("daily_avg_deaths").style.background = "#666";
+
+          d3.selectAll("path").remove();
+
+          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+          //Read the data
+          d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us-states.csv", 
+            // When reading the csv, I must format variables:
+            function(d){
+              return { date : d3.timeParse("%Y-%m-%d")(d.date), deaths_avg : d.deaths_avg, state : d.state }
+            },
+
+            function(data) {
+              var allGroup = d3.map(data, function(d){return(d.state)}).keys();
+              allGroup.sort();
+              console.log(allGroup);
+
+              // add the options to the button
+              d3.select("#selectButton")
+                .selectAll('myOptions')
+                .data(allGroup)
+                .enter()
+                .append('option')
+                .text(function (d) { return d; }) // text showed in the menu
+                .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+              // A color scale: one color for each group
+              var myColor = d3.scaleOrdinal()
+                .domain(allGroup)
+                .range(["#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", "#437e8a", "#ff7463", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", "#fe6616", "#7a7352", "#f9bc0f", "#b65d66", "#07a2e6", "#c091ae", "#8a91a7", "#88fc07", "#d47270", "#9e8010", "#10b437", "#cf7c97", "#f92b75", "#07c99d", "#a946aa", "#bfd544", "#16977e", "#ff6ac8", "#a88178", "#5776a9", "#678007", "#fa9316", "#85c070", "#6aa2a9", "#989e5d", "#fe9169", "#cd714a", "#6ed014", "#c5639c", "#c23271", "#d7908c", "#678275", "#c5a121", "#a978ba", "#ee534e", "#d24506", "#59c3fa", "#ca7b0a"]);
+
+              
+              function returnDatum(group) {
+                var newData = [];
+                for (let i = 0; i < data.length; i++) {
+                  if (data[i].state == group){
+                    newData.push(data[i]);
+                  }                  
+                }
+                return newData;
+              }
+
+              x.domain(d3.extent(data, function(d) { return d.date; }));
+              svg.selectAll(".myXaxis")
+                // .transition()
+                // .duration(3000)
+                .call(xAxis);
+
+              var currentlySelectedOption = d3.select("#selectButton").property("value");
+
+              y.domain([0, d3.max(returnDatum(currentlySelectedOption), function(d) { return +d.deaths_avg;  }) ]);
+                svg.selectAll(".myYaxis")
+                  .transition()
+                  .duration(1500)
+                  .call(yAxis);
+
+
+
+              // Initialize line with first group of the list
+              var line = svg
+                .append('g')
+                .append("path")
+                  .datum(returnDatum(currentlySelectedOption))
+                  // .transition()
+                  // .duration(1000)
+                  .attr("d", d3.line()
+                    .x(function(d) { return x(d.date) })
+                    .y(function(d) { return y(+d.deaths_avg) })
+                  )
+                  .attr("stroke", function(d){ return myColor(currentlySelectedOption) })
+                  .style("stroke-width", 2)
+                  .style("fill", "none")
+
+              function plotToolTip (value) {
+                var focus = svg.append("g")
+                    .attr("class", "focus")
+                    .style("display", "none");
+
+                focus.append("line")
+                    .attr("class", "x-hover-line hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", height);
+
+                focus.append("line")
+                    .attr("class", "y-hover-line hover-line")
+                    .attr("x1", width)
+                    .attr("x2", width);
+
+                focus.append("circle")
+                    .attr("r", 5);
+
+                focus.append("text")
+                    .attr("class", "hover-text")
+                    .attr("x", -60)
+                    .attr("dy", "-1em");
+
+                svg.append("rect")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("class", "overlay")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .on("mouseover", function() { focus.style("display", null); })
+                    .on("mouseout", function() { focus.style("display", "none"); })
+                    .on("mousemove", mousemove);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                function mousemove() {
+                  var x0 = x.invert(d3.mouse(this)[0]),
+                      i = bisectDate(returnDatum(value), x0, 1),
+                      d0 = returnDatum(value)[i - 1],
+                      d1 = returnDatum(value)[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths_avg) + ")");
+                  focus.select("text").text(function() { 
+                    var str = format_date(d.date) + ": " + d.deaths_avg;
+                    return str;
+                  });
+                  focus.select(".x-hover-line").attr("y2", height - y(d.deaths_avg));
+                  focus.select(".y-hover-line").attr("x2", width + width);
+                }
+
+              }
+
+              plotToolTip(currentlySelectedOption)
+
+
+
+              
+              // A function that update the chart
+              function update(selectedGroup) {
+
+                // create the Y axis
+                y.domain([0, d3.max(returnDatum(selectedGroup), function(d) { return +d.deaths_avg;  }) ]);
+                svg.selectAll(".myYaxis")
+                  .transition()
+                  .duration(1500)
+                  .call(yAxis);
+
+                // Create new data with the selection?
+                var dataFilter = data.filter(function(d){return d.state==selectedGroup})
+
+                // Give these new data to update line
+                line
+                    .datum(dataFilter)
+                    .transition()
+                    .duration(3000)
+                    .attr("d", d3.line()
+                      .x(function(d) { return x(d.date) })
+                      .y(function(d) { return y(+d.deaths_avg) })
+                    )
+                    .attr("stroke", function(d){ return myColor(selectedGroup) })
+              }
+
+              // When the button is changed, run the updateChart function
+              d3.select("#selectButton").on("change", function(d) {
+                  // recover the option that has been chosen
+                  var selectedOption = d3.select(this).property("value")
+                  // run the updateChart function with this selected option
+                  update(selectedOption)
+                  setTimeout(function(){
+                    plotToolTip(selectedOption)
+                  }, 1500); 
+                  // plotToolTip(selectedOption)
+              })
+
+          })
+          
+        }
+        
+      }
+
+
+      </script>
+
+  </body>
+</html>
