@@ -3,7 +3,8 @@
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -246,12 +247,12 @@
 
         var div = document.createElement("div");
         div.id = "my_dataviz1";
-        document.getElementById("my_dataviz1_outer").appendChild(div);
+        document.getElementById("my_dataviz1_outer").appendChild(div);        
 
         // set the dimensions and margins of the graph
         var margin = {top: 30, right: 60, bottom: 30, left: 60},
-            width = 1050 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom;
+            width = 1000 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
 
         // append the svg object to the body of the page
         var svg = d3.select("#my_dataviz1")
@@ -372,6 +373,7 @@
               function removeTooltip() {
                 if (tooltip) tooltip.style('display', 'none');
                 if (tooltipLine) tooltipLine.attr('stroke', 'none');
+
               }
 
               function drawTooltip() {
@@ -389,16 +391,10 @@
 
                 var format_date = d3.timeFormat("%m/%d/%y");
 
-                tooltip.html(format_date(d.date) + " - Cases: " + d.cases + " & Deaths: " + d.deaths)
+                tooltip.html(format_date(d.date) + " - Total Cases: " + d.cases + " & Total Deaths: " + d.deaths)
                   .style('display', 'block')
                   .style('left', d3.event.pageX + 20)
                   .style('top', d3.event.pageY - 20)
-                  // .selectAll()
-                  // .data(d.cases)
-                  // .enter()
-                  // .append('div')
-                  // // .style('color', d => d.color)
-                  // .html(d1.cases);
               }
 
               const type = d3.annotationLabel;
@@ -412,7 +408,7 @@
                   data: { date: "2020-01-21", cases: 1 },
                   connector: {type: "elbow"},
                   subject: { radius: 5 },
-                  dy: -400,
+                  dy: -250,
                   dx: 75
                 }
               ]
@@ -426,7 +422,7 @@
                   data: { date: "2020-02-29", deaths: 1 },
                   connector: {type: "elbow"},
                   subject: { radius: 5 },
-                  dy: -450,
+                  dy: -350,
                   dx: 125
                 }
               ]
@@ -439,7 +435,7 @@
                   },
                   data: { date: "2020-08-01", deaths: 154917 },
                   connector: {type: "elbow"},
-                  dy: -350,
+                  dy: -250,
                   dx: 60,
                   subject: { radius: 5 }
                 }
@@ -453,8 +449,8 @@
                   },
                   data: { date: "2020-12-14", cases: 0 },
                   connector: {type: "elbow"},
-                  dy: -250,
-                  dx: 60,
+                  dy: -200,
+                  dx: 40,
                   subject: { radius: 5 }
                 }
               ]
@@ -467,8 +463,8 @@
                   },
                   data: { date: "2021-05-31", cases: 33277912 },
                   connector: {type: "elbow"},
-                  dy: 85,
-                  dx: -10,
+                  dy: 45,
+                  dx: -1,
                   subject: { radius: 5 }
                 }
               ]
@@ -666,6 +662,17 @@
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+        var div = document.createElement("div");
+        div.id = "tooltip";
+        // div.style.position = "absolute";
+        div.style.padding = "5px";
+        div.style.backgroundColor = "white";
+        document.getElementById("my_dataviz2").appendChild(div);
+
+        const tooltip = d3.select('#tooltip');
+        const tooltipLine = svg.append('line');
+        var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
         // Add X axis --> it is a date format
         var x = d3.scaleTime()
               .range([ 0, width ]);
@@ -689,7 +696,7 @@
           document.getElementById("daily_avg_cases").style.background = "#f1f1f1";
           // document.getElementById("daily_avg_cases_100").style.background = "#f1f1f1";
 
-          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+          // var bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
           //Read the data
           d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us.csv",
@@ -732,58 +739,93 @@
                 .attr("stroke", "darkseagreen")
                 .attr("stroke-width", 2)
 
-            function plotToolTip (data) {
-                var focus = svg.append("g")
-                    .attr("class", "focus")
-                    .style("display", "none");
+            // function plotToolTip (data) {
+            //     var focus = svg.append("g")
+            //         .attr("class", "focus")
+            //         .style("display", "none");
 
-                focus.append("line")
-                    .attr("class", "x-hover-line hover-line")
-                    .attr("y1", 0)
-                    .attr("y2", height);
+            //     focus.append("line")
+            //         .attr("class", "x-hover-line hover-line")
+            //         .attr("y1", 0)
+            //         .attr("y2", height);
 
-                focus.append("line")
-                    .attr("class", "y-hover-line hover-line")
-                    .attr("x1", width)
-                    .attr("x2", width);
+            //     focus.append("line")
+            //         .attr("class", "y-hover-line hover-line")
+            //         .attr("x1", width)
+            //         .attr("x2", width);
 
-                focus.append("circle")
-                    .attr("r", 5);
+            //     focus.append("circle")
+            //         .attr("r", 5);
 
-                focus.append("text")
-                    .attr("class", "hover-text")
-                    .attr("x", -60)
-                    .attr("dy", "-1em");
+            //     focus.append("text")
+            //         .attr("class", "hover-text")
+            //         .attr("x", -60)
+            //         .attr("dy", "-1em");
 
-                svg.append("rect")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                    .attr("class", "overlay")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .on("mouseover", function() { focus.style("display", null); })
-                    .on("mouseout", function() { focus.style("display", "none"); })
-                    .on("mousemove", mousemove);
+            //     svg.append("rect")
+            //         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            //         .attr("class", "overlay")
+            //         .attr("width", width)
+            //         .attr("height", height)
+            //         .on("mouseover", function() { focus.style("display", null); })
+            //         .on("mouseout", function() { focus.style("display", "none"); })
+            //         .on("mousemove", mousemove);
 
-                var format_date = d3.timeFormat("%m/%d/%y");
+            //     var format_date = d3.timeFormat("%m/%d/%y");
 
-                function mousemove() {
-                  var x0 = x.invert(d3.mouse(this)[0]),
-                      i = bisectDate(data, x0, 1),
-                      d0 = data[i - 1],
-                      d1 = data[i],
-                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases) + ")");
-                  focus.select("text").text(function() { 
-                    var str = format_date(d.date) + ": " + d.cases;
-                    return str;
-                  });
-                  focus.select(".x-hover-line").attr("y2", height - y(d.cases));
-                  focus.select(".y-hover-line").attr("x2", width + width);
-                }
+            //     function mousemove() {
+            //       var x0 = x.invert(d3.mouse(this)[0]),
+            //           i = bisectDate(data, x0, 1),
+            //           d0 = data[i - 1],
+            //           d1 = data[i],
+            //           d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            //       focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases) + ")");
+            //       focus.select("text").text(function() { 
+            //         var str = format_date(d.date) + ": " + d.cases;
+            //         return str;
+            //       });
+            //       focus.select(".x-hover-line").attr("y2", height - y(d.cases));
+            //       focus.select(".y-hover-line").attr("x2", width + width);
+            //     }
+
+            //   }
+
+            //   plotToolTip(data)
+
+            tipBox = svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('opacity', 0)
+                .attr("class", "overlay")
+                .on('mousemove', drawTooltip)
+                .on('mouseout', removeTooltip);
+
+              function removeTooltip() {
+                if (tooltip) tooltip.style('display', 'none');
+                if (tooltipLine) tooltipLine.attr('stroke', 'none');
 
               }
 
-              plotToolTip(data)
+              function drawTooltip() {
+                const x0 = x.invert(d3.mouse(tipBox.node())[0]);
+                var i = bisectDate(data, x0, 1),
+                      d0 = data[i - 1],
+                      d1 = data[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+                tooltipLine.attr('stroke', 'black')
+                  .attr('x1', x(x0))
+                  .attr('x2', x(x0))
+                  .attr('y1', 0)
+                  .attr('y2', height);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                tooltip.html(format_date(d.date) + " - Daily Cases: " + d.cases)
+                  .style('display', 'block')
+                  .style('left', d3.event.pageX + 20)
+                  .style('top', d3.event.pageY - 20)
+              }
 
               const annotations = [
                 {
@@ -936,7 +978,7 @@
           document.getElementById("daily_cases").style.background = "#f1f1f1";
           document.getElementById("daily_avg_cases").style.background = "#666";
 
-          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+          // var bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
           //Read the data
           d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us.csv",
@@ -978,60 +1020,95 @@
                 .attr("stroke", "olive")
                 .attr("stroke-width", 2) 
 
-            function plotToolTip (data) {
-                var focus = svg.append("g")
-                    .attr("class", "focus")
-                    .style("display", "none");
+            // function plotToolTip (data) {
+            //     var focus = svg.append("g")
+            //         .attr("class", "focus")
+            //         .style("display", "none");
 
-                focus.append("line")
-                    .attr("class", "x-hover-line hover-line")
-                    .attr("y1", 0)
-                    .attr("y2", height);
+            //     focus.append("line")
+            //         .attr("class", "x-hover-line hover-line")
+            //         .attr("y1", 0)
+            //         .attr("y2", height);
 
-                focus.append("line")
-                    .attr("class", "y-hover-line hover-line")
-                    .attr("x1", width)
-                    .attr("x2", width);
+            //     focus.append("line")
+            //         .attr("class", "y-hover-line hover-line")
+            //         .attr("x1", width)
+            //         .attr("x2", width);
 
-                focus.append("circle")
-                    .attr("r", 5);
+            //     focus.append("circle")
+            //         .attr("r", 5);
 
-                focus.append("text")
-                    .attr("class", "hover-text")
-                    .attr("x", -60)
-                    .attr("dy", "-1em");
+            //     focus.append("text")
+            //         .attr("class", "hover-text")
+            //         .attr("x", -60)
+            //         .attr("dy", "-1em");
 
-                svg.append("rect")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                    .attr("class", "overlay")
-                    // .transition()
-                    // .duration(3000)
-                    .attr("width", width)
-                    .attr("height", height)
-                    .on("mouseover", function() { focus.style("display", null); })
-                    .on("mouseout", function() { focus.style("display", "none"); })
-                    .on("mousemove", mousemove);
+            //     svg.append("rect")
+            //         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            //         .attr("class", "overlay")
+            //         // .transition()
+            //         // .duration(3000)
+            //         .attr("width", width)
+            //         .attr("height", height)
+            //         .on("mouseover", function() { focus.style("display", null); })
+            //         .on("mouseout", function() { focus.style("display", "none"); })
+            //         .on("mousemove", mousemove);
 
-                var format_date = d3.timeFormat("%m/%d/%y");
+            //     var format_date = d3.timeFormat("%m/%d/%y");
 
-                function mousemove() {
-                  var x0 = x.invert(d3.mouse(this)[0]),
-                      i = bisectDate(data, x0, 1),
-                      d0 = data[i - 1],
-                      d1 = data[i],
-                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases_avg) + ")");
-                  focus.select("text").text(function() { 
-                    var str = format_date(d.date) + ": " + d.cases_avg;
-                    return str;
-                  });
-                  focus.select(".x-hover-line").attr("y2", height - y(d.cases_avg));
-                  focus.select(".y-hover-line").attr("x2", width + width);
-                }
+            //     function mousemove() {
+            //       var x0 = x.invert(d3.mouse(this)[0]),
+            //           i = bisectDate(data, x0, 1),
+            //           d0 = data[i - 1],
+            //           d1 = data[i],
+            //           d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            //       focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases_avg) + ")");
+            //       focus.select("text").text(function() { 
+            //         var str = format_date(d.date) + ": " + d.cases_avg;
+            //         return str;
+            //       });
+            //       focus.select(".x-hover-line").attr("y2", height - y(d.cases_avg));
+            //       focus.select(".y-hover-line").attr("x2", width + width);
+            //     }
+
+            //   }
+
+            //   plotToolTip(data) 
+
+            tipBox = svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('opacity', 0)
+                .attr("class", "overlay")
+                .on('mousemove', drawTooltip)
+                .on('mouseout', removeTooltip);
+
+              function removeTooltip() {
+                if (tooltip) tooltip.style('display', 'none');
+                if (tooltipLine) tooltipLine.attr('stroke', 'none');
 
               }
 
-              plotToolTip(data) 
+              function drawTooltip() {
+                const x0 = x.invert(d3.mouse(tipBox.node())[0]);
+                var i = bisectDate(data, x0, 1),
+                      d0 = data[i - 1],
+                      d1 = data[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+                tooltipLine.attr('stroke', 'black')
+                  .attr('x1', x(x0))
+                  .attr('x2', x(x0))
+                  .attr('y1', 0)
+                  .attr('y2', height);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                tooltip.html(format_date(d.date) + " - Seven-day Moving Case Average: " + d.cases_avg)
+                  .style('display', 'block')
+                  .style('left', d3.event.pageX + 20)
+                  .style('top', d3.event.pageY - 20)
+              }
         
         })
 
@@ -1126,6 +1203,17 @@
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+        var div = document.createElement("div");
+        div.id = "tooltip";
+        // div.style.position = "absolute";
+        div.style.padding = "5px";
+        div.style.backgroundColor = "white";
+        document.getElementById("my_dataviz3").appendChild(div);
+
+        const tooltip = d3.select('#tooltip');
+        const tooltipLine = svg.append('line');
+        var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
         // Add X axis --> it is a date format
         var x = d3.scaleTime()
               .range([ 0, width ]);
@@ -1149,7 +1237,7 @@
           document.getElementById("daily_avg_deaths").style.background = "#f1f1f1";
           // document.getElementById("daily_avg_deaths_100").style.background = "#f1f1f1";
 
-          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+          // var bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
           //Read the data
           d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us.csv",
@@ -1193,58 +1281,93 @@
                 .attr("stroke-width", 2)  
 
 
-            function plotToolTip (data) {
-                var focus = svg.append("g")
-                    .attr("class", "focus")
-                    .style("display", "none");
+            // function plotToolTip (data) {
+            //     var focus = svg.append("g")
+            //         .attr("class", "focus")
+            //         .style("display", "none");
 
-                focus.append("line")
-                    .attr("class", "x-hover-line hover-line")
-                    .attr("y1", 0)
-                    .attr("y2", height);
+            //     focus.append("line")
+            //         .attr("class", "x-hover-line hover-line")
+            //         .attr("y1", 0)
+            //         .attr("y2", height);
 
-                focus.append("line")
-                    .attr("class", "y-hover-line hover-line")
-                    .attr("x1", width)
-                    .attr("x2", width);
+            //     focus.append("line")
+            //         .attr("class", "y-hover-line hover-line")
+            //         .attr("x1", width)
+            //         .attr("x2", width);
 
-                focus.append("circle")
-                    .attr("r", 5);
+            //     focus.append("circle")
+            //         .attr("r", 5);
 
-                focus.append("text")
-                    .attr("class", "hover-text")
-                    .attr("x", -60)
-                    .attr("dy", "-1em");
+            //     focus.append("text")
+            //         .attr("class", "hover-text")
+            //         .attr("x", -60)
+            //         .attr("dy", "-1em");
 
-                svg.append("rect")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                    .attr("class", "overlay")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .on("mouseover", function() { focus.style("display", null); })
-                    .on("mouseout", function() { focus.style("display", "none"); })
-                    .on("mousemove", mousemove);
+            //     svg.append("rect")
+            //         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            //         .attr("class", "overlay")
+            //         .attr("width", width)
+            //         .attr("height", height)
+            //         .on("mouseover", function() { focus.style("display", null); })
+            //         .on("mouseout", function() { focus.style("display", "none"); })
+            //         .on("mousemove", mousemove);
 
-                var format_date = d3.timeFormat("%m/%d/%y");
+            //     var format_date = d3.timeFormat("%m/%d/%y");
 
-                function mousemove() {
-                  var x0 = x.invert(d3.mouse(this)[0]),
-                      i = bisectDate(data, x0, 1),
-                      d0 = data[i - 1],
-                      d1 = data[i],
-                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths) + ")");
-                  focus.select("text").text(function() { 
-                    var str = format_date(d.date) + ": " + d.deaths;
-                    return str;
-                  });
-                  focus.select(".x-hover-line").attr("y2", height - y(d.deaths));
-                  focus.select(".y-hover-line").attr("x2", width + width);
-                }
+            //     function mousemove() {
+            //       var x0 = x.invert(d3.mouse(this)[0]),
+            //           i = bisectDate(data, x0, 1),
+            //           d0 = data[i - 1],
+            //           d1 = data[i],
+            //           d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            //       focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths) + ")");
+            //       focus.select("text").text(function() { 
+            //         var str = format_date(d.date) + ": " + d.deaths;
+            //         return str;
+            //       });
+            //       focus.select(".x-hover-line").attr("y2", height - y(d.deaths));
+            //       focus.select(".y-hover-line").attr("x2", width + width);
+            //     }
+
+            //   }
+
+            //   plotToolTip(data)
+
+            tipBox = svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('opacity', 0)
+                .attr("class", "overlay")
+                .on('mousemove', drawTooltip)
+                .on('mouseout', removeTooltip);
+
+              function removeTooltip() {
+                if (tooltip) tooltip.style('display', 'none');
+                if (tooltipLine) tooltipLine.attr('stroke', 'none');
 
               }
 
-              plotToolTip(data)
+              function drawTooltip() {
+                const x0 = x.invert(d3.mouse(tipBox.node())[0]);
+                var i = bisectDate(data, x0, 1),
+                      d0 = data[i - 1],
+                      d1 = data[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+                tooltipLine.attr('stroke', 'black')
+                  .attr('x1', x(x0))
+                  .attr('x2', x(x0))
+                  .attr('y1', 0)
+                  .attr('y2', height);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                tooltip.html(format_date(d.date) + " - Daily Deaths: " + d.deaths)
+                  .style('display', 'block')
+                  .style('left', d3.event.pageX + 20)
+                  .style('top', d3.event.pageY - 20)
+              }
 
               const annotations = [
                 {
@@ -1409,7 +1532,7 @@
           document.getElementById("daily_deaths").style.background = "#f1f1f1";
           document.getElementById("daily_avg_deaths").style.background = "#666";
 
-          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+          // var bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
           //Read the data
           d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us.csv",
@@ -1452,58 +1575,92 @@
                 .attr("stroke", "indianred")
                 .attr("stroke-width", 2)  
 
-            function plotToolTip (data) {
-                var focus = svg.append("g")
-                    .attr("class", "focus")
-                    .style("display", "none");
+            // function plotToolTip (data) {
+            //     var focus = svg.append("g")
+            //         .attr("class", "focus")
+            //         .style("display", "none");
 
-                focus.append("line")
-                    .attr("class", "x-hover-line hover-line")
-                    .attr("y1", 0)
-                    .attr("y2", height);
+            //     focus.append("line")
+            //         .attr("class", "x-hover-line hover-line")
+            //         .attr("y1", 0)
+            //         .attr("y2", height);
 
-                focus.append("line")
-                    .attr("class", "y-hover-line hover-line")
-                    .attr("x1", width)
-                    .attr("x2", width);
+            //     focus.append("line")
+            //         .attr("class", "y-hover-line hover-line")
+            //         .attr("x1", width)
+            //         .attr("x2", width);
 
-                focus.append("circle")
-                    .attr("r", 5);
+            //     focus.append("circle")
+            //         .attr("r", 5);
 
-                focus.append("text")
-                    .attr("class", "hover-text")
-                    .attr("x", -60)
-                    .attr("dy", "-1em");
+            //     focus.append("text")
+            //         .attr("class", "hover-text")
+            //         .attr("x", -60)
+            //         .attr("dy", "-1em");
 
-                svg.append("rect")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                    .attr("class", "overlay")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .on("mouseover", function() { focus.style("display", null); })
-                    .on("mouseout", function() { focus.style("display", "none"); })
-                    .on("mousemove", mousemove);
+            //     svg.append("rect")
+            //         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            //         .attr("class", "overlay")
+            //         .attr("width", width)
+            //         .attr("height", height)
+            //         .on("mouseover", function() { focus.style("display", null); })
+            //         .on("mouseout", function() { focus.style("display", "none"); })
+            //         .on("mousemove", mousemove);
 
-                var format_date = d3.timeFormat("%m/%d/%y");
+            //     var format_date = d3.timeFormat("%m/%d/%y");
 
-                function mousemove() {
-                  var x0 = x.invert(d3.mouse(this)[0]),
-                      i = bisectDate(data, x0, 1),
-                      d0 = data[i - 1],
-                      d1 = data[i],
-                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths_avg) + ")");
-                  focus.select("text").text(function() { 
-                    var str = format_date(d.date) + ": " + d.deaths_avg;
-                    return str;
-                  });
-                  focus.select(".x-hover-line").attr("y2", height - y(d.deaths_avg));
-                  focus.select(".y-hover-line").attr("x2", width + width);
-                }
+            //     function mousemove() {
+            //       var x0 = x.invert(d3.mouse(this)[0]),
+            //           i = bisectDate(data, x0, 1),
+            //           d0 = data[i - 1],
+            //           d1 = data[i],
+            //           d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            //       focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths_avg) + ")");
+            //       focus.select("text").text(function() { 
+            //         var str = format_date(d.date) + ": " + d.deaths_avg;
+            //         return str;
+            //       });
+            //       focus.select(".x-hover-line").attr("y2", height - y(d.deaths_avg));
+            //       focus.select(".y-hover-line").attr("x2", width + width);
+            //     }
+
+            //   }
+
+            //   plotToolTip(data)     
+            tipBox = svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('opacity', 0)
+                .attr("class", "overlay")
+                .on('mousemove', drawTooltip)
+                .on('mouseout', removeTooltip);
+
+              function removeTooltip() {
+                if (tooltip) tooltip.style('display', 'none');
+                if (tooltipLine) tooltipLine.attr('stroke', 'none');
 
               }
 
-              plotToolTip(data)                   
+              function drawTooltip() {
+                const x0 = x.invert(d3.mouse(tipBox.node())[0]);
+                var i = bisectDate(data, x0, 1),
+                      d0 = data[i - 1],
+                      d1 = data[i],
+                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+                tooltipLine.attr('stroke', 'black')
+                  .attr('x1', x(x0))
+                  .attr('x2', x(x0))
+                  .attr('y1', 0)
+                  .attr('y2', height);
+
+                var format_date = d3.timeFormat("%m/%d/%y");
+
+                tooltip.html(format_date(d.date) + " - Seven-day Moving Death Average: " + d.deaths_avg)
+                  .style('display', 'block')
+                  .style('left', d3.event.pageX + 20)
+                  .style('top', d3.event.pageY - 20)
+              }              
         
         })    
 
@@ -1610,6 +1767,17 @@
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+        var div = document.createElement("div");
+        div.id = "tooltip";
+        // div.style.position = "absolute";
+        div.style.padding = "5px";
+        div.style.backgroundColor = "white";
+        document.getElementById("my_dataviz4").appendChild(div);
+
+        const tooltip = d3.select('#tooltip');
+        const tooltipLine = svg.append('line');
+        var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
         // Add X axis --> it is a date format
         var x = d3.scaleTime()
               .range([ 0, width ]);
@@ -1634,7 +1802,7 @@
 
           d3.selectAll("path").remove();
 
-          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+          // var bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
           //Read the data
           d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us-states.csv", 
@@ -1702,60 +1870,103 @@
                   .style("stroke-width", 2)
                   .style("fill", "none")
 
-              function plotToolTip (value) {
-                var focus = svg.append("g")
-                    .attr("class", "focus")
-                    .style("display", "none");
+              // function plotToolTip (value) {
+              //   var focus = svg.append("g")
+              //       .attr("class", "focus")
+              //       .style("display", "none");
 
-                focus.append("line")
-                    .attr("class", "x-hover-line hover-line")
-                    .attr("y1", 0)
-                    .attr("y2", height);
+              //   focus.append("line")
+              //       .attr("class", "x-hover-line hover-line")
+              //       .attr("y1", 0)
+              //       .attr("y2", height);
 
-                focus.append("line")
-                    .attr("class", "y-hover-line hover-line")
-                    .attr("x1", width)
-                    .attr("x2", width);
+              //   focus.append("line")
+              //       .attr("class", "y-hover-line hover-line")
+              //       .attr("x1", width)
+              //       .attr("x2", width);
 
-                focus.append("circle")
-                    .attr("r", 5);
+              //   focus.append("circle")
+              //       .attr("r", 5);
 
-                focus.append("text")
-                    .attr("class", "hover-text")
-                    .attr("x", -60)
-                    .attr("dy", "-1em");
+              //   focus.append("text")
+              //       .attr("class", "hover-text")
+              //       .attr("x", -60)
+              //       .attr("dy", "-1em");
 
-                svg.append("rect")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                    .attr("class", "overlay")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .on("mouseover", function() { focus.style("display", null); })
-                    .on("mouseout", function() { focus.style("display", "none"); })
-                    .on("mousemove", mousemove);
+              //   svg.append("rect")
+              //       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+              //       .attr("class", "overlay")
+              //       .attr("width", width)
+              //       .attr("height", height)
+              //       .on("mouseover", function() { focus.style("display", null); })
+              //       .on("mouseout", function() { focus.style("display", "none"); })
+              //       .on("mousemove", mousemove);
 
-                var format_date = d3.timeFormat("%m/%d/%y");
+              //   var format_date = d3.timeFormat("%m/%d/%y");
 
-                function mousemove() {
-                  var x0 = x.invert(d3.mouse(this)[0]),
-                      i = bisectDate(returnDatum(value), x0, 1),
-                      d0 = returnDatum(value)[i - 1],
-                      d1 = returnDatum(value)[i],
-                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases) + ")");
-                  focus.select("text").text(function() { 
-                    var str = format_date(d.date) + ": " + d.cases;
-                    return str;
-                  });
-                  focus.select(".x-hover-line").attr("y2", height - y(d.cases));
-                  focus.select(".y-hover-line").attr("x2", width + width);
+              //   function mousemove() {
+              //     var x0 = x.invert(d3.mouse(this)[0]),
+              //         i = bisectDate(returnDatum(value), x0, 1),
+              //         d0 = returnDatum(value)[i - 1],
+              //         d1 = returnDatum(value)[i],
+              //         d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+              //     focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases) + ")");
+              //     focus.select("text").text(function() { 
+              //       var str = format_date(d.date) + ": " + d.cases;
+              //       return str;
+              //     });
+              //     focus.select(".x-hover-line").attr("y2", height - y(d.cases));
+              //     focus.select(".y-hover-line").attr("x2", width + width);
+              //   }
+
+              // }
+
+              // plotToolTip(currentlySelectedOption)
+
+              function createToolTip(data) {
+
+                  tipBox = svg.append('rect')
+                  .attr('width', width)
+                  .attr('height', height)
+                  .attr('opacity', 0)
+                  .attr("class", "overlay")
+                  .on('mousemove', drawTooltip)
+                  .on('mouseout', removeTooltip);
+
+                function removeTooltip() {
+                  if (tooltip) tooltip.style('display', 'none');
+                  if (tooltipLine) tooltipLine.attr('stroke', 'none');
+
+                }
+
+                function drawTooltip() {
+                  const x0 = x.invert(d3.mouse(tipBox.node())[0]);
+                  var i = bisectDate(data, x0, 1),
+                        d0 = data[i - 1],
+                        d1 = data[i],
+                        d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+                  tooltipLine.attr('stroke', 'black')
+                    .attr('x1', x(x0))
+                    .attr('x2', x(x0))
+                    .attr('y1', 0)
+                    .attr('y2', height);
+
+                  var format_date = d3.timeFormat("%m/%d/%y");
+
+
+                  tooltip.html(format_date(d.date) + " - Daily Cases: " + d.cases)
+                        .style('display', 'block')
+                        .style('left', d3.event.pageX + 20)
+                        .style('top', d3.event.pageY - 20)
+
+
+                  
                 }
 
               }
 
-              plotToolTip(currentlySelectedOption)
-
-
+              createToolTip(returnDatum(currentlySelectedOption))
 
               // A function that update the chart
               function update(selectedGroup) {
@@ -1789,10 +2000,11 @@
                   var selectedOption = d3.select(this).property("value")
                   // run the updateChart function with this selected option
                   update(selectedOption)
-                  setTimeout(function(){
-                    plotToolTip(selectedOption)
-                  }, 1500); 
+                  // setTimeout(function(){
+                  //   plotToolTip(selectedOption)
+                  // }, 1500); 
                   // plotToolTip(selectedOption)
+                  createToolTip(returnDatum(selectedOption))
               })
 
           })
@@ -1807,7 +2019,7 @@
 
           d3.selectAll("path").remove();
 
-          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+          // var bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
           //Read the data
           d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us-states.csv", 
@@ -1877,60 +2089,103 @@
                   .style("stroke-width", 2)
                   .style("fill", "none")
 
-              function plotToolTip (value) {
-                var focus = svg.append("g")
-                    .attr("class", "focus")
-                    .style("display", "none");
+              // function plotToolTip (value) {
+              //   var focus = svg.append("g")
+              //       .attr("class", "focus")
+              //       .style("display", "none");
 
-                focus.append("line")
-                    .attr("class", "x-hover-line hover-line")
-                    .attr("y1", 0)
-                    .attr("y2", height);
+              //   focus.append("line")
+              //       .attr("class", "x-hover-line hover-line")
+              //       .attr("y1", 0)
+              //       .attr("y2", height);
 
-                focus.append("line")
-                    .attr("class", "y-hover-line hover-line")
-                    .attr("x1", width)
-                    .attr("x2", width);
+              //   focus.append("line")
+              //       .attr("class", "y-hover-line hover-line")
+              //       .attr("x1", width)
+              //       .attr("x2", width);
 
-                focus.append("circle")
-                    .attr("r", 5);
+              //   focus.append("circle")
+              //       .attr("r", 5);
 
-                focus.append("text")
-                    .attr("class", "hover-text")
-                    .attr("x", -60)
-                    .attr("dy", "-1em");
+              //   focus.append("text")
+              //       .attr("class", "hover-text")
+              //       .attr("x", -60)
+              //       .attr("dy", "-1em");
 
-                svg.append("rect")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                    .attr("class", "overlay")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .on("mouseover", function() { focus.style("display", null); })
-                    .on("mouseout", function() { focus.style("display", "none"); })
-                    .on("mousemove", mousemove);
+              //   svg.append("rect")
+              //       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+              //       .attr("class", "overlay")
+              //       .attr("width", width)
+              //       .attr("height", height)
+              //       .on("mouseover", function() { focus.style("display", null); })
+              //       .on("mouseout", function() { focus.style("display", "none"); })
+              //       .on("mousemove", mousemove);
 
-                var format_date = d3.timeFormat("%m/%d/%y");
+              //   var format_date = d3.timeFormat("%m/%d/%y");
 
-                function mousemove() {
-                  var x0 = x.invert(d3.mouse(this)[0]),
-                      i = bisectDate(returnDatum(value), x0, 1),
-                      d0 = returnDatum(value)[i - 1],
-                      d1 = returnDatum(value)[i],
-                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases_avg) + ")");
-                  focus.select("text").text(function() { 
-                    var str = format_date(d.date) + ": " + d.cases_avg;
-                    return str;
-                  });
-                  focus.select(".x-hover-line").attr("y2", height - y(d.cases_avg));
-                  focus.select(".y-hover-line").attr("x2", width + width);
+              //   function mousemove() {
+              //     var x0 = x.invert(d3.mouse(this)[0]),
+              //         i = bisectDate(returnDatum(value), x0, 1),
+              //         d0 = returnDatum(value)[i - 1],
+              //         d1 = returnDatum(value)[i],
+              //         d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+              //     focus.attr("transform", "translate(" + x(d.date) + "," + y(d.cases_avg) + ")");
+              //     focus.select("text").text(function() { 
+              //       var str = format_date(d.date) + ": " + d.cases_avg;
+              //       return str;
+              //     });
+              //     focus.select(".x-hover-line").attr("y2", height - y(d.cases_avg));
+              //     focus.select(".y-hover-line").attr("x2", width + width);
+              //   }
+
+              // }
+
+              // plotToolTip(currentlySelectedOption)
+
+              function createToolTip(data) {
+
+                  tipBox = svg.append('rect')
+                  .attr('width', width)
+                  .attr('height', height)
+                  .attr('opacity', 0)
+                  .attr("class", "overlay")
+                  .on('mousemove', drawTooltip)
+                  .on('mouseout', removeTooltip);
+
+                function removeTooltip() {
+                  if (tooltip) tooltip.style('display', 'none');
+                  if (tooltipLine) tooltipLine.attr('stroke', 'none');
+
+                }
+
+                function drawTooltip() {
+                  const x0 = x.invert(d3.mouse(tipBox.node())[0]);
+                  var i = bisectDate(data, x0, 1),
+                        d0 = data[i - 1],
+                        d1 = data[i],
+                        d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+                  tooltipLine.attr('stroke', 'black')
+                    .attr('x1', x(x0))
+                    .attr('x2', x(x0))
+                    .attr('y1', 0)
+                    .attr('y2', height);
+
+                  var format_date = d3.timeFormat("%m/%d/%y");
+
+
+                  tooltip.html(format_date(d.date) + " - Seven-day Moving Case Average: " + d.cases_avg)
+                        .style('display', 'block')
+                        .style('left', d3.event.pageX + 20)
+                        .style('top', d3.event.pageY - 20)
+
+
+                  
                 }
 
               }
 
-              plotToolTip(currentlySelectedOption)
-
-
+              createToolTip(returnDatum(currentlySelectedOption))
 
               
               // A function that update the chart
@@ -1964,10 +2219,11 @@
                   var selectedOption = d3.select(this).property("value")
                   // run the updateChart function with this selected option
                   update(selectedOption)
-                  setTimeout(function(){
-                    plotToolTip(selectedOption)
-                  }, 1500); 
+                  // setTimeout(function(){
+                  //   plotToolTip(selectedOption)
+                  // }, 1500); 
                   // plotToolTip(selectedOption)
+                  createToolTip(returnDatum(selectedOption))
               })
 
           })
@@ -2069,6 +2325,17 @@
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+        var div = document.createElement("div");
+        div.id = "tooltip";
+        // div.style.position = "absolute";
+        div.style.padding = "5px";
+        div.style.backgroundColor = "white";
+        document.getElementById("my_dataviz5").appendChild(div);
+
+        const tooltip = d3.select('#tooltip');
+        const tooltipLine = svg.append('line');
+        var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
         // Add X axis --> it is a date format
         var x = d3.scaleTime()
               .range([ 0, width ]);
@@ -2093,7 +2360,7 @@
 
           d3.selectAll("path").remove();
 
-          var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+          // var bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
           //Read the data
           d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us-states.csv", 
@@ -2161,58 +2428,103 @@
                   .style("stroke-width", 2)
                   .style("fill", "none")
 
-              function plotToolTip (value) {
-                var focus = svg.append("g")
-                    .attr("class", "focus")
-                    .style("display", "none");
+              // function plotToolTip (value) {
+              //   var focus = svg.append("g")
+              //       .attr("class", "focus")
+              //       .style("display", "none");
 
-                focus.append("line")
-                    .attr("class", "x-hover-line hover-line")
-                    .attr("y1", 0)
-                    .attr("y2", height);
+              //   focus.append("line")
+              //       .attr("class", "x-hover-line hover-line")
+              //       .attr("y1", 0)
+              //       .attr("y2", height);
 
-                focus.append("line")
-                    .attr("class", "y-hover-line hover-line")
-                    .attr("x1", width)
-                    .attr("x2", width);
+              //   focus.append("line")
+              //       .attr("class", "y-hover-line hover-line")
+              //       .attr("x1", width)
+              //       .attr("x2", width);
 
-                focus.append("circle")
-                    .attr("r", 5);
+              //   focus.append("circle")
+              //       .attr("r", 5);
 
-                focus.append("text")
-                    .attr("class", "hover-text")
-                    .attr("x", -60)
-                    .attr("dy", "-1em");
+              //   focus.append("text")
+              //       .attr("class", "hover-text")
+              //       .attr("x", -60)
+              //       .attr("dy", "-1em");
 
-                svg.append("rect")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                    .attr("class", "overlay")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .on("mouseover", function() { focus.style("display", null); })
-                    .on("mouseout", function() { focus.style("display", "none"); })
-                    .on("mousemove", mousemove);
+              //   svg.append("rect")
+              //       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+              //       .attr("class", "overlay")
+              //       .attr("width", width)
+              //       .attr("height", height)
+              //       .on("mouseover", function() { focus.style("display", null); })
+              //       .on("mouseout", function() { focus.style("display", "none"); })
+              //       .on("mousemove", mousemove);
 
-                var format_date = d3.timeFormat("%m/%d/%y");
+              //   var format_date = d3.timeFormat("%m/%d/%y");
 
-                function mousemove() {
-                  var x0 = x.invert(d3.mouse(this)[0]),
-                      i = bisectDate(returnDatum(value), x0, 1),
-                      d0 = returnDatum(value)[i - 1],
-                      d1 = returnDatum(value)[i],
-                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths) + ")");
-                  focus.select("text").text(function() { 
-                    var str = format_date(d.date) + ": " + d.deaths;
-                    return str;
-                  });
-                  focus.select(".x-hover-line").attr("y2", height - y(d.deaths));
-                  focus.select(".y-hover-line").attr("x2", width + width);
+              //   function mousemove() {
+              //     var x0 = x.invert(d3.mouse(this)[0]),
+              //         i = bisectDate(returnDatum(value), x0, 1),
+              //         d0 = returnDatum(value)[i - 1],
+              //         d1 = returnDatum(value)[i],
+              //         d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+              //     focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths) + ")");
+              //     focus.select("text").text(function() { 
+              //       var str = format_date(d.date) + ": " + d.deaths;
+              //       return str;
+              //     });
+              //     focus.select(".x-hover-line").attr("y2", height - y(d.deaths));
+              //     focus.select(".y-hover-line").attr("x2", width + width);
+              //   }
+
+              // }
+
+              // plotToolTip(currentlySelectedOption)
+
+              function createToolTip(data) {
+
+                  tipBox = svg.append('rect')
+                  .attr('width', width)
+                  .attr('height', height)
+                  .attr('opacity', 0)
+                  .attr("class", "overlay")
+                  .on('mousemove', drawTooltip)
+                  .on('mouseout', removeTooltip);
+
+                function removeTooltip() {
+                  if (tooltip) tooltip.style('display', 'none');
+                  if (tooltipLine) tooltipLine.attr('stroke', 'none');
+
+                }
+
+                function drawTooltip() {
+                  const x0 = x.invert(d3.mouse(tipBox.node())[0]);
+                  var i = bisectDate(data, x0, 1),
+                        d0 = data[i - 1],
+                        d1 = data[i],
+                        d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+                  tooltipLine.attr('stroke', 'black')
+                    .attr('x1', x(x0))
+                    .attr('x2', x(x0))
+                    .attr('y1', 0)
+                    .attr('y2', height);
+
+                  var format_date = d3.timeFormat("%m/%d/%y");
+
+
+                  tooltip.html(format_date(d.date) + " - Daily Deaths: " + d.deaths)
+                        .style('display', 'block')
+                        .style('left', d3.event.pageX + 20)
+                        .style('top', d3.event.pageY - 20)
+
+
+                  
                 }
 
               }
 
-              plotToolTip(currentlySelectedOption)
+              createToolTip(returnDatum(currentlySelectedOption))
 
 
 
@@ -2248,10 +2560,13 @@
                   var selectedOption = d3.select(this).property("value")
                   // run the updateChart function with this selected option
                   update(selectedOption)
-                  setTimeout(function(){
-                    plotToolTip(selectedOption)
-                  }, 1500); 
+                  // setTimeout(function(){
+                  //   plotToolTip(selectedOption)
+                  // }, 1500); 
                   // plotToolTip(selectedOption)
+
+                  createToolTip(returnDatum(selectedOption))
+
               })
 
           })
@@ -2336,59 +2651,103 @@
                   .style("stroke-width", 2)
                   .style("fill", "none")
 
-              function plotToolTip (value) {
-                var focus = svg.append("g")
-                    .attr("class", "focus")
-                    .style("display", "none");
+              // function plotToolTip (value) {
+              //   var focus = svg.append("g")
+              //       .attr("class", "focus")
+              //       .style("display", "none");
 
-                focus.append("line")
-                    .attr("class", "x-hover-line hover-line")
-                    .attr("y1", 0)
-                    .attr("y2", height);
+              //   focus.append("line")
+              //       .attr("class", "x-hover-line hover-line")
+              //       .attr("y1", 0)
+              //       .attr("y2", height);
 
-                focus.append("line")
-                    .attr("class", "y-hover-line hover-line")
-                    .attr("x1", width)
-                    .attr("x2", width);
+              //   focus.append("line")
+              //       .attr("class", "y-hover-line hover-line")
+              //       .attr("x1", width)
+              //       .attr("x2", width);
 
-                focus.append("circle")
-                    .attr("r", 5);
+              //   focus.append("circle")
+              //       .attr("r", 5);
 
-                focus.append("text")
-                    .attr("class", "hover-text")
-                    .attr("x", -60)
-                    .attr("dy", "-1em");
+              //   focus.append("text")
+              //       .attr("class", "hover-text")
+              //       .attr("x", -60)
+              //       .attr("dy", "-1em");
 
-                svg.append("rect")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                    .attr("class", "overlay")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .on("mouseover", function() { focus.style("display", null); })
-                    .on("mouseout", function() { focus.style("display", "none"); })
-                    .on("mousemove", mousemove);
+              //   svg.append("rect")
+              //       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+              //       .attr("class", "overlay")
+              //       .attr("width", width)
+              //       .attr("height", height)
+              //       .on("mouseover", function() { focus.style("display", null); })
+              //       .on("mouseout", function() { focus.style("display", "none"); })
+              //       .on("mousemove", mousemove);
 
-                var format_date = d3.timeFormat("%m/%d/%y");
+              //   var format_date = d3.timeFormat("%m/%d/%y");
 
-                function mousemove() {
-                  var x0 = x.invert(d3.mouse(this)[0]),
-                      i = bisectDate(returnDatum(value), x0, 1),
-                      d0 = returnDatum(value)[i - 1],
-                      d1 = returnDatum(value)[i],
-                      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-                  focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths_avg) + ")");
-                  focus.select("text").text(function() { 
-                    var str = format_date(d.date) + ": " + d.deaths_avg;
-                    return str;
-                  });
-                  focus.select(".x-hover-line").attr("y2", height - y(d.deaths_avg));
-                  focus.select(".y-hover-line").attr("x2", width + width);
+              //   function mousemove() {
+              //     var x0 = x.invert(d3.mouse(this)[0]),
+              //         i = bisectDate(returnDatum(value), x0, 1),
+              //         d0 = returnDatum(value)[i - 1],
+              //         d1 = returnDatum(value)[i],
+              //         d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+              //     focus.attr("transform", "translate(" + x(d.date) + "," + y(d.deaths_avg) + ")");
+              //     focus.select("text").text(function() { 
+              //       var str = format_date(d.date) + ": " + d.deaths_avg;
+              //       return str;
+              //     });
+              //     focus.select(".x-hover-line").attr("y2", height - y(d.deaths_avg));
+              //     focus.select(".y-hover-line").attr("x2", width + width);
+              //   }
+
+              // }
+
+              // plotToolTip(currentlySelectedOption)
+
+              function createToolTip(data) {
+
+                  tipBox = svg.append('rect')
+                  .attr('width', width)
+                  .attr('height', height)
+                  .attr('opacity', 0)
+                  .attr("class", "overlay")
+                  .on('mousemove', drawTooltip)
+                  .on('mouseout', removeTooltip);
+
+                function removeTooltip() {
+                  if (tooltip) tooltip.style('display', 'none');
+                  if (tooltipLine) tooltipLine.attr('stroke', 'none');
+
+                }
+
+                function drawTooltip() {
+                  const x0 = x.invert(d3.mouse(tipBox.node())[0]);
+                  var i = bisectDate(data, x0, 1),
+                        d0 = data[i - 1],
+                        d1 = data[i],
+                        d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+                  tooltipLine.attr('stroke', 'black')
+                    .attr('x1', x(x0))
+                    .attr('x2', x(x0))
+                    .attr('y1', 0)
+                    .attr('y2', height);
+
+                  var format_date = d3.timeFormat("%m/%d/%y");
+
+
+                  tooltip.html(format_date(d.date) + " - Seven-day Moving Death Average: " + d.deaths_avg)
+                        .style('display', 'block')
+                        .style('left', d3.event.pageX + 20)
+                        .style('top', d3.event.pageY - 20)
+
+
+                  
                 }
 
               }
 
-              plotToolTip(currentlySelectedOption)
-
+              createToolTip(returnDatum(currentlySelectedOption))
 
 
               
@@ -2423,10 +2782,11 @@
                   var selectedOption = d3.select(this).property("value")
                   // run the updateChart function with this selected option
                   update(selectedOption)
-                  setTimeout(function(){
-                    plotToolTip(selectedOption)
-                  }, 1500); 
+                  // setTimeout(function(){
+                  //   plotToolTip(selectedOption)
+                  // }, 1500); 
                   // plotToolTip(selectedOption)
+                  createToolTip(returnDatum(selectedOption))
               })
 
           })
